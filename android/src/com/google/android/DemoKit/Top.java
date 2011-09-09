@@ -40,13 +40,14 @@ public class Top extends Activity implements Runnable {
 
     FileOutputStream mOutputStream;
 
+    int servo1Level = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         mUsbManager = UsbManager.getInstance(this);
-        mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(
-                ACTION_USB_PERMISSION), 0);
+        mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
         IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
         filter.addAction(UsbManager.ACTION_USB_ACCESSORY_DETACHED);
         registerReceiver(mUsbReceiver, filter);
@@ -62,10 +63,17 @@ public class Top extends Activity implements Runnable {
         Button backwardMotor1Button = (Button) findViewById(R.id.BackwardMotor1);
         stopMotor1Button.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                MotorCommand mc = new MotorCommand();
-                mc.setCommandByte(MotorCommand.motor2Stop);
+                // MotorCommand mc = new MotorCommand();
+                // mc.setCommandByte(MotorCommand.motor2Stop);
+                ServoCommand sc = new ServoCommand();
+                servo1Level += 15;
+                if (servo1Level >= 64) {
+                    servo1Level = 0;
+                }
+                sc.setDegree(servo1Level);
                 try {
-                    mOutputStream.write(mc.toBytes());
+                    // mOutputStream.write(mc.toBytes());
+                    mOutputStream.write(sc.toBytes());
                 } catch (IOException e) {
                     // TODO 自動生成された catch ブロック
                     e.printStackTrace();
@@ -74,10 +82,16 @@ public class Top extends Activity implements Runnable {
         });
         forwardMotor1Button.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                MotorCommand mc = new MotorCommand();
-                mc.setCommandByte(MotorCommand.motor2Forward);
+                // MotorCommand mc = new MotorCommand();
+                // mc.setCommandByte(MotorCommand.motor2Forward);
+                ServoCommand sc = new ServoCommand();
+                servo1Level -= 15;
+                if (servo1Level < 0) {
+                    servo1Level = 63;
+                }
+                sc.setDegree(servo1Level);
                 try {
-                    mOutputStream.write(mc.toBytes());
+                    mOutputStream.write(sc.toBytes());
                 } catch (IOException e) {
                     // TODO 自動生成された catch ブロック
                     e.printStackTrace();
