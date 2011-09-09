@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:orientation="vertical" android:background="@drawable/background_holo_dark">
+	<Button android:id="@+id/StopMotor1" android:text="停止"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:layout_weight="1" android:textSize="60sp" />
+	<Button android:id="@+id/ForwardMotor1" android:text="回転"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:layout_weight="1" android:textSize="60sp" />
+	<Button android:id="@+id/BackwardMotor1" android:text="逆回転"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:layout_weight="1" android:textSize="60sp" />
+</LinearLayout>
