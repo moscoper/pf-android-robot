@@ -69,7 +69,6 @@ void setup() {
 void loop() {
   byte cmdByte[4];
   if (acc.isConnected()) {
-    if (Serial.available() > 0) {
       int len = acc.read(cmdByte, sizeof(cmdByte), 1);
       //cmdByte = acc.read();
       if (len > 0) {
@@ -81,7 +80,6 @@ void loop() {
           // to do
         }
       }
-    }
   }
   delay(100);
 }
@@ -89,18 +87,22 @@ void loop() {
 int get_cmd_type(byte data) {
   //data check
   if ((data & B11000000) == B00000000) {
+    Serial.print("\r\nData");
     return DATA;
   }
   //motor cmd check
   if ((data & B11000000) == B01000000) {
+    Serial.print("\r\nMotor");
     return MOTOR_CMD;
   }
   //servo cmd check
   if ((data & B11000000) == B10000000) {
+    Serial.print("\r\nServo");
     return SERVO_CMD;
   }
   //LED cmd check
   if ((data & B11000000) == B11000000) {
+    Serial.print("\r\nLed");
     return LED_CMD;
   }
 }
@@ -160,7 +162,14 @@ void run_motor_cmd(byte cmd, byte motor1data, byte motor2data) {
   }
 }
 
+int convert2deg (int n) {
+  int r = n*180/64;
+  if (r==0) r++;
+  return r;
+}
+
 void run_servo_cmd(byte cmd, byte servo1data, byte servo2data, byte servo3data) {
+  Serial.print("\r\nrun serv");
   //check servo1
   if ((cmd & B00000001) == B00000000) {
     // servo1 stop
