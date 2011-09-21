@@ -1,0 +1,1 @@
+/workspace/OpenCV-2.3.0/android/apps/FaceRecognition/build/jni/CMakeFiles/TestBar.dir
