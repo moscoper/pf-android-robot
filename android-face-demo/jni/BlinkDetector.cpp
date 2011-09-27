@@ -202,7 +202,7 @@ void BlinkDetector::findFace (int input_idx, image_pool* pool) {
       stage = DETECTION_MODE;
     //}
   }
-  cvCopy(outImage, &srcImage);
+  //cvCopy(outImage, &srcImage);
   /*
   if (nc < 10 && nc >= 2) {
     if (!cvSaveImage(outfile, outImage)) {

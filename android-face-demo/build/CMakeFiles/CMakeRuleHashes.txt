@@ -1,2 +1,0 @@
-# Hashes of file build rules.
-57fc0d0920b4b259a12cc26887bc8f37 jni/foobarJAVA_wrap.cxx
