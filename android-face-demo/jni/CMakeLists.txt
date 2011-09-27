@@ -51,12 +51,19 @@ endif(ANDROID)
 SET(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-I${AndroidOpenCV_SWIG_DIR}" )
 
 SET_SOURCE_FILES_PROPERTIES(foobar.i PROPERTIES CPLUSPLUS ON)
+SET_SOURCE_FILES_PROPERTIES(BlinkModule.i PROPERTIES CPLUSPLUS ON)
 
 #add the swig module, giving it the name, java, and then all of the source files
 SWIG_ADD_MODULE(TestBar java 
                 foobar.i #swig file
                 TestBar.cpp #cpp files can be compiled to
                 )
+
+SWIG_ADD_MODULE(BlinkDetector java 
+                BlinkModule.i #swig file
+                BlinkDetector.cpp #cpp files can be compiled to
+                )
              
 #link the module like any other   
 target_link_libraries(TestBar ${LIBRARY_DEPS} )
+target_link_libraries(BlinkDetector ${LIBRARY_DEPS} )

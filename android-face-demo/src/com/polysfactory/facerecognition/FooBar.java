@@ -33,6 +33,7 @@ import com.opencv.jni.image_pool;
 import com.opencv.jni.opencv;
 import com.opencv.opengl.GL2CameraViewer;
 import com.polysfactory.facerecognition.jni.BarBar;
+import com.polysfactory.facerecognition.jni.BlinkDetector;
 import com.polysfactory.facerecognition.jni.FooBarStruct;
 
 public class FooBar extends Activity {
@@ -181,6 +182,8 @@ public class FooBar extends Activity {
 
         BarBar barbar = new BarBar();
 
+        BlinkDetector blinkDetector = new BlinkDetector();
+
         @Override
         public void process(int idx, image_pool pool, long timestamp, NativeProcessor nativeProcessor) {
 
@@ -201,7 +204,8 @@ public class FooBar extends Activity {
             // int num = faceDetector.findFaces(bitmap, faces);
             // Log.v(TAG, num + " faces found.");
 
-            barbar.recognizeFace(idx, pool);
+            // barbar.recognizeFace(idx, pool);
+            blinkDetector.findFace(idx, pool);
 
             // call a function - this function does absolutely nothing!
             // barbar.crazy();

@@ -17,7 +17,7 @@ LOCAL_MODULE    := foobar
 
 #make sure to pass in SWIG_C_OUT=gen/foobar_swig.cpp
 #done in the makefile
-LOCAL_SRC_FILES := gen/foo_swig.cpp TestBar.cpp
+LOCAL_SRC_FILES := gen/foo_swig.cpp TestBar.cpp BlinkDetector.cpp
 
 include $(BUILD_SHARED_LIBRARY)
 
