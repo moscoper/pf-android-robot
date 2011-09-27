@@ -77,7 +77,7 @@ void loop() {
         } else if (get_cmd_type(cmdByte[0]) == SERVO_CMD) {
           run_servo_cmd(cmdByte[0], cmdByte[1], cmdByte[2], cmdByte[3]);
         } else if (get_cmd_type(cmdByte[0]) == LED_CMD) {
-          // to do
+          run_led_cmd(cmdByte[0], cmdByte[1], cmdByte[2]);
         }
       }
   }
@@ -207,6 +207,23 @@ void run_servo_cmd(byte cmd, byte servo1data, byte servo2data, byte servo3data) 
   if (servo3_move) {
     servos[2].write(servo3_deg);
   }
+}
+
+void run_led_cmd(byte cmd, byte led1data, byte led2data) {
+  Serial.print("\r\nrun led");
+  //check led1
+  if ((cmd & B00000001) == B00000000) {
+    // led1 off
+  } else if ((cmd & B00000001) == B00000001) {
+    // led1 on
+  }
+  //check led2
+  if ((cmd & B00000010) == B00000000) {
+    // led2 off
+  } else if ((cmd & B00000010) == B00000010) {
+    // led2 on
+  }
+  
 }
 
 int byte2dec(byte b) {
