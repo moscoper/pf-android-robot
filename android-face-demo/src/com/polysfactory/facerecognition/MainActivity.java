@@ -42,6 +42,12 @@ public class MainActivity extends Activity {
 
     private final int FOOBARABOUT = 0;
 
+    enum FaceDetectionMode {
+        ViolaAndJones, BlinkDetection;
+    }
+
+    FaceDetectionMode faceDetectionMode = FaceDetectionMode.ViolaAndJones;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -116,6 +122,8 @@ public class MainActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(R.string.about_menu);
+        menu.add("Viola&Jones");
+        menu.add("BlinkDetection");
         return true;
     }
 
@@ -126,8 +134,13 @@ public class MainActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // example menu
-        if (item.getTitle().equals(getResources().getString(R.string.about_menu))) {
+        String title = item.getTitle().toString();
+        if (title.equals(getString(R.string.about_menu))) {
             showDialog(FOOBARABOUT);
+        } else if (title.equals("Viola&Jones")) {
+            faceDetectionMode = FaceDetectionMode.ViolaAndJones;
+        } else if (title.equals("BlinkDetection")) {
+            faceDetectionMode = FaceDetectionMode.BlinkDetection;
         }
         return true;
     }
@@ -180,8 +193,10 @@ public class MainActivity extends Activity {
 
         FooBarStruct foo = new FooBarStruct();
 
+        // Haar特徴量を利用したViola And Jonesのアルゴリズムによる顔検出器
         BarBar barbar = new BarBar();
 
+        // 瞬き検出による顔検出器
         BlinkDetector blinkDetector = new BlinkDetector();
 
         @Override
@@ -204,8 +219,11 @@ public class MainActivity extends Activity {
             // int num = faceDetector.findFaces(bitmap, faces);
             // Log.v(TAG, num + " faces found.");
 
-            // barbar.recognizeFace(idx, pool);
-            blinkDetector.findFace(idx, pool);
+            if (FaceDetectionMode.ViolaAndJones == faceDetectionMode) {
+                barbar.recognizeFace(idx, pool);
+            } else if (FaceDetectionMode.BlinkDetection == faceDetectionMode) {
+                blinkDetector.findFace(idx, pool);
+            }
 
             // call a function - this function does absolutely nothing!
             // barbar.crazy();
