@@ -15,6 +15,7 @@
 #define POINT_TL(r)  cvPoint(r.x, r.y)
 #define POINT_BR(r)  cvPoint(r.x + r.width, r.y + r.height)
 #define POINTS(r)  POINT_TL(r), POINT_BR(r)
+#define CENTER(r) cvPoint(r.x + (r.width/2), r.y + (r.height/2))
 
 #define max(x,y) (((x)>(y))?(x):(y))
 #define min(x,y) (((x)<(y))?(x):(y))
@@ -40,7 +41,7 @@ BlinkDetector::BlinkDetector() {
   LOG("Initialize BlinkDetector\n");
 
   // Initialize Font
-  cvInitFont(&font, CV_FONT_HERSHEY_DUPLEX, 0.5, 0.5, 0, 1, 8);
+  cvInitFont(&font, CV_FONT_HERSHEY_DUPLEX, 1.0, 1.0, 0, 3, 8);
 
   // Storage for Temporally Different Image Regions
   storage = cvCreateMemStorage(0);
@@ -155,9 +156,16 @@ void BlinkDetector::findFace (int input_idx, image_pool* pool) {
       //cvRectangle(cdiff,POINTS(eye2),cvScalarAll(255),1, 8, 0);
       //crop_rect(&srcImage, FaceBox[0],FaceImg[faces]);
       LOG("face score = %f\n", score);
-      if (score >SCTH) {
+      //if (score >SCTH) {
 
         //If you want to see the template enable the following line.
+        sprintf(txt,"%1.3lf",score);
+        CvPoint eyeCenter = CENTER(eye1);
+        eyeCenter.y+=20;
+        cvPutText(&srcImage, txt,
+            eyeCenter,
+            &font, CV_RGB(0,0,0));
+
         //DrawFace(FaceImg[faces]);
 
         //Draw Bounding boxes of eyes
@@ -183,10 +191,10 @@ void BlinkDetector::findFace (int input_idx, image_pool* pool) {
         }
         
          LOG("------- %03d ----------\n",faces);
-      }
-      else{
-         LOG("            ----->S=%lf\n",score);
-      }
+      //}
+      //else{
+      //   LOG("            ----->S=%lf\n",score);
+      //}
     }
     
     LOG("%d faces detected", faces);
