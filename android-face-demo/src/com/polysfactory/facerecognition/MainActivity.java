@@ -36,7 +36,7 @@ import com.polysfactory.facerecognition.jni.BarBar;
 import com.polysfactory.facerecognition.jni.BlinkDetector;
 import com.polysfactory.facerecognition.jni.FooBarStruct;
 
-public class FooBar extends Activity {
+public class MainActivity extends Activity {
 
     private static final String TAG = "Face";
 
