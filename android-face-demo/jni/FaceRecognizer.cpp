@@ -11,7 +11,7 @@ FaceRecognizer::FaceRecognizer () {
     "/data/data/com.polysfactory.facerecognition/files/haarcascade_mcs_mouth.xml");
   objectMatcher = new ObjectMatcher();
   // load feature vector
-  objectMatcher->loadDescription("");
+  objectMatcher->loadDescription("/data/data/com.polysfactory.facerecognition/files/takahiro.txt");
 }
 
 /**
