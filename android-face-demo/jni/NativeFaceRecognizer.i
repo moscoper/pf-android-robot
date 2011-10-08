@@ -1,5 +1,5 @@
-/* File : foobar.i */
-%module foobar
+/* File : NativeFaceRecognizer.i */
+%module NativeFaceRecognizer
 
 /*
  * the java import code muse be included for the opencv jni wrappers
@@ -21,7 +21,7 @@ import com.opencv.jni.*; //import the android-opencv jni wrappers
 			//check the apk generated, by opening it in an archive manager, to verify that
 			//both these libraries are present
 			System.loadLibrary("android-opencv");
-			System.loadLibrary("TestBar");
+			System.loadLibrary("FaceRecognizer");
 		} catch (UnsatisfiedLinkError e) {
 			//badness
 			throw e;
@@ -32,7 +32,7 @@ import com.opencv.jni.*; //import the android-opencv jni wrappers
 
 %{
 #include "image_pool.h"
-#include "TestBar.h"
+#include "FaceRecognizer.h"
 using namespace cv;
 %}
 
@@ -45,29 +45,12 @@ using namespace cv;
 //make sure to import the image_pool as it is 
 //referenced by the Processor java generated
 //class
-%typemap(javaimports) FooBarStruct "
-import com.opencv.jni.image_pool;// import the image_pool interface for playing nice with android-opencv
-
-/** FooBar - template
-*/"
-
-//sample inline class that needs to include image_pool
-struct FooBarStruct {
-	
-	int pool_image_count(image_pool* pool){
-		return pool->getCount();
-	}
-	
-};
-
 //sample jni class
-%typemap(javaimports) BarBar "
+%typemap(javaimports) FaceRecognizer "
 import com.opencv.jni.image_pool;// import the image_pool interface for playing nice with android-opencv
 "
-class BarBar{
+class FaceRecognizer{
 public:
-	BarBar();
-	void recognizeFace(int idx, image_pool* pool);
-private:
-	CascadeClassifier cascade_face;
+	FaceRecognizer();
+	void recognize(int idx, image_pool* pool);
 };

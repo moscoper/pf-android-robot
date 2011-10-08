@@ -10,7 +10,7 @@ package com.polysfactory.facerecognition.jni;
 
 import com.opencv.jni.*; //import the android-opencv jni wrappers
 
-class BlinkModuleJNI {
+class NativeFaceRecognizerJNI {
 
 	static {
 		try {
@@ -22,7 +22,7 @@ class BlinkModuleJNI {
 			//check the apk generated, by opening it in an archive manager, to verify that
 			//both these libraries are present
 			System.loadLibrary("android-opencv");
-      System.loadLibrary("BlinkDetector");
+			System.loadLibrary("FaceRecognizer");
 		} catch (UnsatisfiedLinkError e) {
 			//badness
 			throw e;
@@ -30,7 +30,7 @@ class BlinkModuleJNI {
 	}
 
 
-  public final static native long new_BlinkDetector();
-  public final static native void BlinkDetector_findFace(long jarg1, BlinkDetector jarg1_, int jarg2, long jarg3, image_pool jarg3_);
-  public final static native void delete_BlinkDetector(long jarg1);
+  public final static native long new_FaceRecognizer();
+  public final static native void FaceRecognizer_recognize(long jarg1, FaceRecognizer jarg1_, int jarg2, long jarg3, image_pool jarg3_);
+  public final static native void delete_FaceRecognizer(long jarg1);
 }

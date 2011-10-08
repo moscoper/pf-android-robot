@@ -1,0 +1,28 @@
+/*
+ * TestBar.h
+ *
+ *  Created on: Jul 17, 2010
+ *      Author: ethan
+ */
+
+#ifndef FACE_RECOGNIZER_H_
+#define FACE_RECOGNIZER_H_
+
+#include <opencv2/opencv.hpp>
+
+#include "image_pool.h"
+#include "HaarFaceDetector.h"
+
+using namespace std;
+using namespace cv;
+
+class FaceRecognizer{
+public:
+	FaceRecognizer();
+  ~FaceRecognizer();
+	void recognize(int idx, image_pool* pool);
+private:
+  HaarFaceDetector* haarFaceDetector;
+};
+
+#endif /* FACE_RECOGNIZER_H_ */

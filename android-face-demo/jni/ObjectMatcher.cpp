@@ -68,7 +68,7 @@ lastIndex(-1)
  */
 ObjectMatcher::~ObjectMatcher()
 {
-	cvReleaseLSH(lsh);
+	cvReleaseLSH(&lsh);
 }
 
 int ObjectMatcher::getObjectId (int index) {
@@ -169,7 +169,7 @@ int ObjectMatcher::match (IplImage* queryImage) {
 				int id = getObjectId(idx);
 				if (id == maxId) {
 					CvSURFPoint* spt = (CvSURFPoint*)cvGetSeqElem(queryKeypoints, i);
-					circle(img, spt->pt, 3, cvScalar(255, 0, 255, 0));
+					//circle(img, spt->pt, 3, cvScalar(255, 0, 255, 0));
 				}
 			}
 		}
@@ -178,8 +178,8 @@ int ObjectMatcher::match (IplImage* queryImage) {
 	}
 	
 	// 後始末
-	cvReleaseMat(indices);
-	cvReleaseMat(dists);
+	cvReleaseMat(&indices);
+	cvReleaseMat(&dists);
 	cvClearSeq(queryKeypoints);
 	cvClearSeq(queryDescriptors);
 	cvReleaseMemStorage(&storage);

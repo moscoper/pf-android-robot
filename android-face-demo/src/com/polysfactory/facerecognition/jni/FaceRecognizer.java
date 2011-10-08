@@ -10,16 +10,14 @@ package com.polysfactory.facerecognition.jni;
 
 import com.opencv.jni.image_pool;// import the image_pool interface for playing nice with android-opencv
 
-/** FooBar - template
-*/
-public class FooBarStruct {
+public class FaceRecognizer {
   private long swigCPtr;
   protected boolean swigCMemOwn;
-  public FooBarStruct(long cPtr, boolean cMemoryOwn) {
+  public FaceRecognizer(long cPtr, boolean cMemoryOwn) {
 	swigCMemOwn = cMemoryOwn;
 	swigCPtr = cPtr;
   }
-  public static long getCPtr(FooBarStruct obj) {
+  public static long getCPtr(FaceRecognizer obj) {
 	return (obj == null) ? 0 : obj.swigCPtr;
   }
 
@@ -30,17 +28,17 @@ public class FooBarStruct {
   public synchronized void delete() {
     if(swigCPtr != 0 && swigCMemOwn) {
       swigCMemOwn = false;
-      foobarJNI.delete_FooBarStruct(swigCPtr);
+      NativeFaceRecognizerJNI.delete_FaceRecognizer(swigCPtr);
     }
     swigCPtr = 0;
   }
 
-  public int pool_image_count(image_pool pool) {
-    return foobarJNI.FooBarStruct_pool_image_count(swigCPtr, this, image_pool.getCPtr(pool), pool);
+  public FaceRecognizer() {
+    this(NativeFaceRecognizerJNI.new_FaceRecognizer(), true);
   }
 
-  public FooBarStruct() {
-    this(foobarJNI.new_FooBarStruct(), true);
+  public void recognize(int idx, image_pool pool) {
+    NativeFaceRecognizerJNI.FaceRecognizer_recognize(swigCPtr, this, idx, image_pool.getCPtr(pool), pool);
   }
 
 }

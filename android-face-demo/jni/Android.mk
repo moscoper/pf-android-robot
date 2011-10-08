@@ -1,7 +1,3 @@
-# date: Summer, 2010 
-# author: Ethan Rublee
-# contact: ethan.rublee@gmail.com
-#
 LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
@@ -17,7 +13,7 @@ LOCAL_MODULE    := foobar
 
 #make sure to pass in SWIG_C_OUT=gen/foobar_swig.cpp
 #done in the makefile
-LOCAL_SRC_FILES := gen/foo_swig.cpp TestBar.cpp BlinkDetector.cpp
+LOCAL_SRC_FILES := gen/foo_swig.cpp TestBar.cpp BlinkDetector.cpp ObjectMatcher.cpp
 
 include $(BUILD_SHARED_LIBRARY)
 

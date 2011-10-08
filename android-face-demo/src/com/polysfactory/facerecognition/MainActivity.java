@@ -32,9 +32,7 @@ import com.opencv.jni.Mat;
 import com.opencv.jni.image_pool;
 import com.opencv.jni.opencv;
 import com.opencv.opengl.GL2CameraViewer;
-import com.polysfactory.facerecognition.jni.BarBar;
-import com.polysfactory.facerecognition.jni.BlinkDetector;
-import com.polysfactory.facerecognition.jni.FooBarStruct;
+import com.polysfactory.facerecognition.jni.FaceRecognizer;
 
 public class MainActivity extends Activity {
 
@@ -191,13 +189,7 @@ public class MainActivity extends Activity {
 
     class SpamProcessor implements NativeProcessor.PoolCallback {
 
-        FooBarStruct foo = new FooBarStruct();
-
-        // Haar特徴量を利用したViola And Jonesのアルゴリズムによる顔検出器
-        BarBar barbar = new BarBar();
-
-        // 瞬き検出による顔検出器
-        BlinkDetector blinkDetector = new BlinkDetector();
+        FaceRecognizer faceRecognizer = new FaceRecognizer();
 
         @Override
         public void process(int idx, image_pool pool, long timestamp, NativeProcessor nativeProcessor) {
@@ -219,11 +211,11 @@ public class MainActivity extends Activity {
             // int num = faceDetector.findFaces(bitmap, faces);
             // Log.v(TAG, num + " faces found.");
 
-            if (FaceDetectionMode.ViolaAndJones == faceDetectionMode) {
-                barbar.recognizeFace(idx, pool);
-            } else if (FaceDetectionMode.BlinkDetection == faceDetectionMode) {
-                blinkDetector.findFace(idx, pool);
-            }
+            /*
+             * if (FaceDetectionMode.ViolaAndJones == faceDetectionMode) { barbar.recognizeFace(idx, pool); } else if (FaceDetectionMode.BlinkDetection == faceDetectionMode) {
+             * blinkDetector.findFace(idx, pool); }
+             */
+            faceRecognizer.recognize(idx, pool);
 
             // call a function - this function does absolutely nothing!
             // barbar.crazy();
