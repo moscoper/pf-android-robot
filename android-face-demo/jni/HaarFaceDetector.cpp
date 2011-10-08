@@ -22,35 +22,19 @@ HaarFaceDetector::HaarFaceDetector (const char* haarcascadeFaceFile, const char*
     LOGE("ERROR: Could not load classifier cascade mouth\n");
     return;
   }
-  //if(!cascade_face.load(haarcascadeFaceFile)){
-    //__android_log_write(ANDROID_LOG_DEBUG, "Face", "ERROR: Could not load classifier cascade");
-    //LOGE("ERROR: Could not load classifier cascade\n");
-    //return;
-  //}
-  //if(!cascade_face.load(haarcascadeEyeFile)){
-  //}
 }
 
-void HaarFaceDetector::recognizeFace(IplImage* srcImage)
+CvRect* HaarFaceDetector::detectFace(IplImage* srcImage)
 {
   double scale = 3.0;
   double t = 0;
   //__android_log_write(ANDROID_LOG_DEBUG, "Face", "recognizeFace Start");
   LOGD("recognizeFace Start\n");
   
+  //グレースケール画像の作成
   IplImage* greyImage = cvCreateImage(cvGetSize(srcImage), IPL_DEPTH_8U, 1);
   cvCvtColor(srcImage, greyImage, CV_BGR2GRAY);
-  //if (img.empty() || greyimage.empty()) {
-  //  return NULL;
-  //}
-  
-  // モナリザのマスク画像になるようにとりあえず固定
-  IplImage *outImage = cvCreateImage (cvSize(386, 600), IPL_DEPTH_8U, 3);
-  //Mat small_img = cvCreateImage( cvSize( cvRound (img.rows()/scale),
-  //                           cvRound (img.cols()/scale)), 8, 1 );
-  // Mat target ( cvRound (img.rows/scale), cvRound(img.cols/scale), CV_8UC1 );
-  //Mat target = greyimage;
-  
+    
   int i=0;
   CvSeq* faces;
   t = (double)cvGetTickCount();
@@ -70,10 +54,10 @@ void HaarFaceDetector::recognizeFace(IplImage* srcImage)
 
   int facen = (faces ? faces->total : 0);
   LOGD("%d faces detected\n", facen);
-  //__android_log_print(ANDROID_LOG_DEBUG, "Face", "detection time = %g ms\n", t/((double)cvGetTickFrequency()*1000.) );
-  //__android_log_print(ANDROID_LOG_DEBUG, "Face", "%d faces detected", faces.size());
-  for(int i = 0; i < facen; i++ )
-  {
+  LOGD("detection time = %g ms\n", t/((double)cvGetTickFrequency()*1000.) );
+  
+  CvRect* faceRect = NULL;
+  for(int i = 0; i < facen; i++ ) {
     CvRect* r = (CvRect*)cvGetSeqElem( faces, i );
     LOGD("face %d (x,y)=(%d,%d) (w,h)=(%d,%d)\n", i, r->x, r->y, r->width, r->height*2/3);
     
@@ -114,7 +98,7 @@ void HaarFaceDetector::recognizeFace(IplImage* srcImage)
       //|CV_HAAR_DO_CANNY_PRUNING
       //|CV_HAAR_SCALE_IMAGE
       ,
-      Size(30, 30) );
+      Size(20, 20) );
     cvResetImageROI(srcImage);
     int eyen = (eyes ? eyes->total : 0);
     if (eyen > 0) eyeFound = true;     
@@ -134,23 +118,25 @@ void HaarFaceDetector::recognizeFace(IplImage* srcImage)
       //|CV_HAAR_DO_CANNY_PRUNING
       //|CV_HAAR_SCALE_IMAGE
       ,
-      Size(30, 30) );
+      Size(20, 20) );
     cvResetImageROI(srcImage);
     int mouthn = (mouthes ? mouthes->total : 0);
     if (mouthn > 0) {
       monthFound = true;
     }    
     LOGD("%d mouthes detected\n", mouthn);
-    
-    if (!eyeFound || !monthFound) {
-      cvReleaseMemStorage(&storage2);    
-      cvReleaseMemStorage(&storage3);
-      continue;
-    }
-    
+
     // 解放処理
     cvReleaseMemStorage(&storage2);
     cvReleaseMemStorage(&storage3);
+    
+    if (!eyeFound || !monthFound) {
+      continue;
+    } else {
+      faceRect = r;
+      break;
+    }
+    
     
     //return outImage;
         
@@ -183,6 +169,6 @@ void HaarFaceDetector::recognizeFace(IplImage* srcImage)
   
   // 解放処理
   cvReleaseImage(&greyImage);
-  //return outImage;
-  return;
+  
+  return faceRect;
 }
