@@ -10,15 +10,13 @@
 
 #include <opencv2/opencv.hpp>
 
-#include "image_pool.h"
-
 using namespace std;
 using namespace cv;
 
 class HaarFaceDetector{
 public:
 	HaarFaceDetector(const char* haarcascadeFaceFile, const char* haarcascadeEyeFile, const char* haarcascadeMouthFile);
-	CvRect* detectFace(IplImage* srcImage);
+	CvRect detectFace(IplImage* srcImage);
 private:
 	CvHaarClassifierCascade* cascade_face;
   CvHaarClassifierCascade* cascade_eye;

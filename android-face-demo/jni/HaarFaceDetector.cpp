@@ -9,37 +9,40 @@ HaarFaceDetector::HaarFaceDetector (const char* haarcascadeFaceFile, const char*
 {
   cascade_face = (CvHaarClassifierCascade*)cvLoad(haarcascadeFaceFile);
   if (cascade_face == NULL) {
-    LOGE("ERROR: Could not load classifier cascade face\n");
+    LOGE("ERROR: Could not load classifier cascade face");
     return;  
   }
   cascade_eye  = (CvHaarClassifierCascade*)cvLoad(haarcascadeEyeFile);
   if (cascade_eye == NULL) {
-    LOGE("ERROR: Could not load classifier cascade eye\n");
+    LOGE("ERROR: Could not load classifier cascade eye");
     return;  
   }
   cascade_mouth = (CvHaarClassifierCascade*)cvLoad(haarcascadeMouthFile);
   if (cascade_mouth == NULL) {
-    LOGE("ERROR: Could not load classifier cascade mouth\n");
+    LOGE("ERROR: Could not load classifier cascade mouth");
     return;
   }
 }
 
-CvRect* HaarFaceDetector::detectFace(IplImage* srcImage)
+/**
+ * 顔を検出する
+ */
+CvRect HaarFaceDetector::detectFace(IplImage* greyImage)
 {
   double scale = 3.0;
   double t = 0;
   //__android_log_write(ANDROID_LOG_DEBUG, "Face", "recognizeFace Start");
-  LOGD("recognizeFace Start\n");
+  LOGD("recognizeFace Start");
   
   //グレースケール画像の作成
-  IplImage* greyImage = cvCreateImage(cvGetSize(srcImage), IPL_DEPTH_8U, 1);
-  cvCvtColor(srcImage, greyImage, CV_BGR2GRAY);
+  //IplImage* greyImage = cvCreateImage(cvGetSize(srcImage), IPL_DEPTH_8U, 1);
+  //cvCvtColor(srcImage, greyImage, CV_BGR2GRAY);
     
   int i=0;
   CvSeq* faces;
   t = (double)cvGetTickCount();
   
-  LOGD("cascade face detect\n");
+  LOGD("cascade face detect");
   
   CvMemStorage* storage1 = cvCreateMemStorage (0);
   faces = cvHaarDetectObjects(greyImage, cascade_face, storage1, 1.1, 2, 0
@@ -53,13 +56,14 @@ CvRect* HaarFaceDetector::detectFace(IplImage* srcImage)
   t = (double)cvGetTickCount() - t;
 
   int facen = (faces ? faces->total : 0);
-  LOGD("%d faces detected\n", facen);
-  LOGD("detection time = %g ms\n", t/((double)cvGetTickFrequency()*1000.) );
+  LOGD("%d faces detected", facen);
+  LOGD("detection time = %g ms", t/((double)cvGetTickFrequency()*1000.) );
   
-  CvRect* faceRect = NULL;
+  CvRect faceRect;
+
   for(int i = 0; i < facen; i++ ) {
     CvRect* r = (CvRect*)cvGetSeqElem( faces, i );
-    LOGD("face %d (x,y)=(%d,%d) (w,h)=(%d,%d)\n", i, r->x, r->y, r->width, r->height*2/3);
+    LOGD("face %d (x,y)=(%d,%d) (w,h)=(%d,%d)", i, r->x, r->y, r->width, r->height*2/3);
     
     // Scalar color = colors[i%8];
     Scalar color = CV_RGB(255,0,0);
@@ -87,11 +91,12 @@ CvRect* HaarFaceDetector::detectFace(IplImage* srcImage)
     /* detecting eye */
     CvSeq* eyes;
     CvMemStorage* storage2 = cvCreateMemStorage (0);
-    if(!cascade_eye)
-      continue;
-    cvSetImageROI(srcImage, cvRect(r->x, r->y, r->width, r->height));
+    if(!cascade_eye) {
+      LOGE("no cascade eye");
+    }
+    cvSetImageROI(greyImage, cvRect(r->x, r->y, r->width, r->height));
     //smallImgROI = smallImg(*r);
-    eyes = cvHaarDetectObjects(srcImage, cascade_eye, storage2,
+    eyes = cvHaarDetectObjects(greyImage, cascade_eye, storage2,
       1.1, 2, 0
       //|CV_HAAR_FIND_BIGGEST_OBJECT
       //|CV_HAAR_DO_ROUGH_SEARCH
@@ -99,19 +104,21 @@ CvRect* HaarFaceDetector::detectFace(IplImage* srcImage)
       //|CV_HAAR_SCALE_IMAGE
       ,
       Size(20, 20) );
-    cvResetImageROI(srcImage);
+    cvResetImageROI(greyImage);
     int eyen = (eyes ? eyes->total : 0);
     if (eyen > 0) eyeFound = true;     
-    LOGD("%d eyes detected\n", eyen);
+    LOGD("%d eyes detected", eyen);
     
     /* detecting mouth */
     CvSeq* mouthes;
     CvMemStorage* storage3 = cvCreateMemStorage (0);
-    if(!cascade_mouth)
+    if(!cascade_mouth) {
+      LOGE("no cascade month");
       continue;
-    cvSetImageROI(srcImage, cvRect(r->x, r->y + (r->height * 2/3), r->width, r->height/3));
+    }
+    cvSetImageROI(greyImage, cvRect(r->x, r->y + (r->height * 2/3), r->width, r->height/3));
     //smallImgROI = smallImg(*r);
-    mouthes = cvHaarDetectObjects(srcImage, cascade_mouth, storage3,
+    mouthes = cvHaarDetectObjects(greyImage, cascade_mouth, storage3,
       1.1, 2, 0
       //|CV_HAAR_FIND_BIGGEST_OBJECT
       //|CV_HAAR_DO_ROUGH_SEARCH
@@ -119,12 +126,12 @@ CvRect* HaarFaceDetector::detectFace(IplImage* srcImage)
       //|CV_HAAR_SCALE_IMAGE
       ,
       Size(20, 20) );
-    cvResetImageROI(srcImage);
+    cvResetImageROI(greyImage);
     int mouthn = (mouthes ? mouthes->total : 0);
     if (mouthn > 0) {
       monthFound = true;
     }    
-    LOGD("%d mouthes detected\n", mouthn);
+    LOGD("%d mouthes detected", mouthn);
 
     // 解放処理
     cvReleaseMemStorage(&storage2);
@@ -133,7 +140,7 @@ CvRect* HaarFaceDetector::detectFace(IplImage* srcImage)
     if (!eyeFound || !monthFound) {
       continue;
     } else {
-      faceRect = r;
+      memcpy(&faceRect, r, sizeof(CvRect));
       break;
     }
     
@@ -165,10 +172,10 @@ CvRect* HaarFaceDetector::detectFace(IplImage* srcImage)
 
   }
    
-  LOGD("face detection end\n");
+  LOGD("face detection end");
   
   // 解放処理
-  cvReleaseImage(&greyImage);
+  // cvReleaseImage(&greyImage);
   
   return faceRect;
 }
