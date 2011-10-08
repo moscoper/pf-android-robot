@@ -52,7 +52,8 @@ public class MainActivity extends Activity {
 
         try {
             Log.d("Face", "copy keypoints file");
-            copy2Local();
+            copy2Local("haarcascades");
+            copy2Local("features");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -252,9 +253,9 @@ public class MainActivity extends Activity {
      * assets以下のファイルをアプリのfilesディレクトリにコピーする<br>
      * @throws IOException IO例外
      */
-    private void copy2Local() throws IOException {
+    private void copy2Local(String target) throws IOException {
         // assetsから読み込み、出力する
-        String[] fileList = getResources().getAssets().list("haarcascades");
+        String[] fileList = getResources().getAssets().list(target);
         if (fileList == null || fileList.length == 0) {
             return;
         }
@@ -264,7 +265,7 @@ public class MainActivity extends Activity {
         BufferedOutputStream bos = null;
 
         for (String file : fileList) {
-            String outFileName = "haarcascades" + "/" + file;
+            String outFileName = target + "/" + file;
             Log.v("Face", "copy file:" + outFileName);
             input = as.open(outFileName);
             fos = openFileOutput(file, Context.MODE_WORLD_READABLE);
