@@ -16,10 +16,10 @@ using namespace std;
 namespace soundtouch {
   class RobotAudio {
   public:
-    int execute();
+    int pitchShift(float pitch);
   private:
     void openFiles(WavInFile **inFile, WavOutFile **outFile);
-    void setup(SoundTouch *pSoundTouch, const WavInFile *inFile);
+    void setup(SoundTouch *pSoundTouch, const WavInFile *inFile, float pitch);
     void process(SoundTouch *pSoundTouch, WavInFile *inFile, WavOutFile *outFile);
   };
 }

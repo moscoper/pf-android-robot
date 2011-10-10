@@ -60,7 +60,7 @@ class NativeSoundTouchJNI {
   public final static native int SoundTouch_getSetting(long jarg1, SoundTouch jarg1_, int jarg2);
   public final static native long SoundTouch_numUnprocessedSamples(long jarg1, SoundTouch jarg1_);
   public final static native int BUFF_SIZE_get();
-  public final static native int RobotAudio_execute(long jarg1, RobotAudio jarg1_);
+  public final static native int RobotAudio_pitchShift(long jarg1, RobotAudio jarg1_, float jarg2);
   public final static native long new_RobotAudio();
   public final static native void delete_RobotAudio(long jarg1);
 }

@@ -33,8 +33,8 @@ public class RobotAudio {
     swigCPtr = 0;
   }
 
-  public int execute() {
-    return NativeSoundTouchJNI.RobotAudio_execute(swigCPtr, this);
+  public int pitchShift(float pitch) {
+    return NativeSoundTouchJNI.RobotAudio_pitchShift(swigCPtr, this, pitch);
   }
 
   public RobotAudio() {

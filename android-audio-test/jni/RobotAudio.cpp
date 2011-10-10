@@ -21,7 +21,8 @@ void RobotAudio::openFiles(WavInFile **inFile, WavOutFile **outFile)
 
 // Sets the 'SoundTouch' object up according to input file sound format & 
 // command line parameters
-void RobotAudio::setup(SoundTouch *pSoundTouch, const WavInFile *inFile)
+void RobotAudio::setup(SoundTouch *pSoundTouch, const WavInFile *inFile, float pitch)
+
 {
   LOGD("setup");
   int sampleRate;
@@ -32,7 +33,7 @@ void RobotAudio::setup(SoundTouch *pSoundTouch, const WavInFile *inFile)
   pSoundTouch->setSampleRate(sampleRate);
   pSoundTouch->setChannels(channels);
   //pSoundTouch->setTempoChange(params->tempoDelta);
-  pSoundTouch->setPitchSemiTones(20.0F);
+  pSoundTouch->setPitchSemiTones(pitch);
   //pSoundTouch->setRateChange(params->rateDelta);
   //pSoundTouch->setSetting(SETTING_USE_QUICKSEEK, params->quick);
   //pSoundTouch->setSetting(SETTING_USE_AA_FILTER, !(params->noAntiAlias));
@@ -104,7 +105,7 @@ void RobotAudio::process(SoundTouch *pSoundTouch, WavInFile *inFile, WavOutFile 
   } while (nSamples != 0);
 }
 
-int RobotAudio::execute()
+int RobotAudio::pitchShift(float pitch)
 {
   LOGD("execute start");
   WavInFile *inFile;
@@ -117,7 +118,7 @@ int RobotAudio::execute()
       openFiles(&inFile, &outFile);
 
       // Setup the 'SoundTouch' object for processing the sound
-      setup(&soundTouch, inFile);
+      setup(&soundTouch, inFile, pitch);
 
       // Process the sound
       process(&soundTouch, inFile, outFile);
