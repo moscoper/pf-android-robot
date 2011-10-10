@@ -49,6 +49,4 @@ SWIG_ADD_MODULE(SoundTouch java
 )
 
 #link the module like any other
-#target_link_libraries(FaceRecognizer ${LIBRARY_DEPS} )
-#target_link_libraries(HaarFaceDetector ${LIBRARY_DEPS} )
-#target_link_libraries(BlinkDetector ${LIBRARY_DEPS} )
+target_link_libraries(SoundTouch ${LIBRARY_DEPS} )
