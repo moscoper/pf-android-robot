@@ -27,8 +27,7 @@ HaarFaceDetector::HaarFaceDetector (const char* haarcascadeFaceFile, const char*
 /**
  * 顔を検出する
  */
-CvRect HaarFaceDetector::detectFace(IplImage* greyImage)
-{
+bool HaarFaceDetector::detectFace(IplImage* greyImage, CvRect* faceRect) {
   double scale = 3.0;
   double t = 0;
   //__android_log_write(ANDROID_LOG_DEBUG, "Face", "recognizeFace Start");
@@ -59,7 +58,8 @@ CvRect HaarFaceDetector::detectFace(IplImage* greyImage)
   LOGD("%d faces detected", facen);
   LOGD("detection time = %g ms", t/((double)cvGetTickFrequency()*1000.) );
   
-  CvRect faceRect;
+  //CvRect faceRect;
+  bool found = false;
 
   for(int i = 0; i < facen; i++ ) {
     CvRect* r = (CvRect*)cvGetSeqElem( faces, i );
@@ -137,10 +137,11 @@ CvRect HaarFaceDetector::detectFace(IplImage* greyImage)
     cvReleaseMemStorage(&storage2);
     cvReleaseMemStorage(&storage3);
     
-    if (!eyeFound || !monthFound) {
+    if (!eyeFound && !monthFound) {
       continue;
     } else {
-      memcpy(&faceRect, r, sizeof(CvRect));
+      memcpy(faceRect, r, sizeof(CvRect));
+      found = true;
       break;
     }
     
@@ -177,5 +178,6 @@ CvRect HaarFaceDetector::detectFace(IplImage* greyImage)
   // 解放処理
   // cvReleaseImage(&greyImage);
   
-  return faceRect;
+  // return faceRect;
+  return found;
 }

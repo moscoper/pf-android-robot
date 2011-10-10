@@ -21,10 +21,11 @@ class FaceRecognizer{
 public:
 	FaceRecognizer();
   ~FaceRecognizer();
-	void recognize(int idx, image_pool* pool);
+	int recognize(int idx, image_pool* pool);
 private:
   HaarFaceDetector* haarFaceDetector;
   ObjectMatcher* objectMatcher;
+  CvFont font;
 };
 
 #endif /* FACE_RECOGNIZER_H_ */

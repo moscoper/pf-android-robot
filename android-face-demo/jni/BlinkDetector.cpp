@@ -135,8 +135,9 @@ void BlinkDetector::findFace (int input_idx, image_pool* pool) {
   
   nc = getConnectedComp(cdiff, &comp);
   // comment in for show diff image
-  //IplImage* outImage = cvCloneImage(&srcImage);
-  /*
+  
+  /**/
+  IplImage* outImage = cvCloneImage(&srcImage);
   cvCvtColor(cdiff, outImage, CV_GRAY2RGB);
   CvSeq* c = comp;
   for(int i=0; i<nc && c!=0; i++){
@@ -145,7 +146,7 @@ void BlinkDetector::findFace (int input_idx, image_pool* pool) {
     cvRectangle(outImage, POINTS(r), CV_RGB(255,255,0), 2, 8, 0);
     c = c->h_next;
   }
-  */
+  /**/
   
   //cvCopy(outImage, &srcImage);
 
@@ -169,15 +170,17 @@ void BlinkDetector::findFace (int input_idx, image_pool* pool) {
         //DrawFace(FaceImg[faces]);
 
         //Draw Bounding boxes of eyes
+        /*
         cvRectangle(&srcImage,POINTS(eye1),CV_RGB(255,0,0), 2,8,0);
         cvRectangle(&srcImage,POINTS(eye2),CV_RGB(255,0,0), 2,8,0);
-        //cvRectangle(outImage,POINTS(eye1),CV_RGB(255,0,0), 2,8,0);
-        //cvRectangle(outImage,POINTS(eye2),CV_RGB(255,0,0), 2,8,0);
+         */
+        cvRectangle(outImage,POINTS(eye1),CV_RGB(255,0,0), 2,8,0);
+        cvRectangle(outImage,POINTS(eye2),CV_RGB(255,0,0), 2,8,0);
         
         //Draw Face Region on frame
         int NPTS[1] = {4};
-        cvPolyLine(&srcImage,FaceBox,NPTS,1,0,CV_RGB(0,255,0), 2,8,0);
-        //cvPolyLine(outImage,FaceBox,NPTS,1,0,CV_RGB(0,255,0), 2,8,0);
+        //cvPolyLine(&srcImage,FaceBox,NPTS,1,0,CV_RGB(0,255,0), 2,8,0);
+        cvPolyLine(outImage,FaceBox,NPTS,1,0,CV_RGB(0,255,0), 2,8,0);
         
         //Show Detected Face Image
         //cvShowImage(wnd_face, FaceImg[faces]);
@@ -210,7 +213,7 @@ void BlinkDetector::findFace (int input_idx, image_pool* pool) {
       stage = DETECTION_MODE;
     //}
   }
-  //cvCopy(outImage, &srcImage);
+  cvCopy(outImage, &srcImage);
   /*
   if (nc < 10 && nc >= 2) {
     if (!cvSaveImage(outfile, outImage)) {

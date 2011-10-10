@@ -52,5 +52,5 @@ import com.opencv.jni.image_pool;// import the image_pool interface for playing 
 class FaceRecognizer{
 public:
 	FaceRecognizer();
-	void recognize(int idx, image_pool* pool);
+  int recognize(int idx, image_pool* pool);
 };

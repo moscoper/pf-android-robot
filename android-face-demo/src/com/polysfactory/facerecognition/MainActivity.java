@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -19,9 +20,9 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
@@ -32,26 +33,29 @@ import com.opencv.jni.Mat;
 import com.opencv.jni.image_pool;
 import com.opencv.jni.opencv;
 import com.opencv.opengl.GL2CameraViewer;
-import com.polysfactory.facerecognition.jni.FaceRecognizer;
 
+/**
+ * Androidくんメインアクティビティ<br>
+ * @author $Author$
+ * @version $Revision$
+ */
 public class MainActivity extends Activity {
 
-    private static final String TAG = "Face";
+    /** タグ */
+    private static final String TAG = "PFFaceDetector_Java";
 
     private final int FOOBARABOUT = 0;
 
-    enum FaceDetectionMode {
-        ViolaAndJones, BlinkDetection;
-    }
+    UsbCommander mUsbCommander;
 
-    FaceDetectionMode faceDetectionMode = FaceDetectionMode.ViolaAndJones;
+    Brain brain;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         try {
-            Log.d("Face", "copy keypoints file");
+            Log.d(TAG, "copy keypoints file");
             copy2Local("haarcascades");
             copy2Local("features");
         } catch (IOException e) {
@@ -60,6 +64,7 @@ public class MainActivity extends Activity {
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         FrameLayout frame = new FrameLayout(this);
 
@@ -79,12 +84,24 @@ public class MainActivity extends Activity {
         // make the glview overlay ontop of video preview
         mPreview.setZOrderMediaOverlay(false);
 
+        // set Auto Focus
+        mPreview.postautofocus(0);
+
         glview = new GL2CameraViewer(getApplication(), false, 0, 0);
         glview.setZOrderMediaOverlay(true);
         glview.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
         frame.addView(glview);
 
         setContentView(frame);
+
+        mUsbCommander = new UsbCommander(this);
+        brain = new Brain(this, mUsbCommander);
+    }
+
+    @Override
+    protected void onDestroy() {
+        mUsbCommander.unregisterReceiver();
+        super.onDestroy();
     }
 
     /*
@@ -121,8 +138,6 @@ public class MainActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(R.string.about_menu);
-        menu.add("Viola&Jones");
-        menu.add("BlinkDetection");
         return true;
     }
 
@@ -136,10 +151,6 @@ public class MainActivity extends Activity {
         String title = item.getTitle().toString();
         if (title.equals(getString(R.string.about_menu))) {
             showDialog(FOOBARABOUT);
-        } else if (title.equals("Viola&Jones")) {
-            faceDetectionMode = FaceDetectionMode.ViolaAndJones;
-        } else if (title.equals("BlinkDetection")) {
-            faceDetectionMode = FaceDetectionMode.BlinkDetection;
         }
         return true;
     }
@@ -160,6 +171,8 @@ public class MainActivity extends Activity {
 
         glview.onPause();
 
+        // USBアクセサリ関連
+        mUsbCommander.closeAccessory();
     }
 
     @Override
@@ -174,7 +187,7 @@ public class MainActivity extends Activity {
         LinkedList<NativeProcessor.PoolCallback> cbstack = new LinkedList<PoolCallback>();
 
         // SpamProcessor will be called first
-        cbstack.add(new SpamProcessor());
+        cbstack.add(new Processor());
 
         // then the same idx and pool will be passed to
         // the glview callback -
@@ -185,49 +198,22 @@ public class MainActivity extends Activity {
 
         mPreview.addCallbackStack(cbstack);
         mPreview.onResume();
-
+        
+        mUsbCommander.reopen();
     }
 
-    class SpamProcessor implements NativeProcessor.PoolCallback {
-
-        FaceRecognizer faceRecognizer = new FaceRecognizer();
+    class Processor implements NativeProcessor.PoolCallback {
 
         @Override
         public void process(int idx, image_pool pool, long timestamp, NativeProcessor nativeProcessor) {
 
             // example of using the jni generated FoobarStruct;
-            // int nImages = foo.pool_image_count(pool);
-            // Log.i("foobar", "Number of images in pool: " + nImages);
-
-            // Face[] faces = new Face[3];
-            // Log.v(TAG, "getImage start");
-            // Mat mat = pool.getImage(idx);
-            // Log.v(TAG, "getImage end");
-            // if (mat == null) {
-            // Log.v(TAG, "pool.getImage is null");
-            // return;
-            // }
-            // Bitmap bitmap = matToBitmap(mat);
-            // FaceDetector faceDetector = new FaceDetector(bitmap.getWidth(), bitmap.getHeight(), faces.length);
-            // int num = faceDetector.findFaces(bitmap, faces);
-            // Log.v(TAG, num + " faces found.");
-
             /*
-             * if (FaceDetectionMode.ViolaAndJones == faceDetectionMode) { barbar.recognizeFace(idx, pool); } else if (FaceDetectionMode.BlinkDetection == faceDetectionMode) {
-             * blinkDetector.findFace(idx, pool); }
+             * int nImages = foo.pool_image_count(pool); Log.i("foobar", "Number of images in pool: " + nImages); Face[] faces = new Face[3]; Log.v(TAG, "getImage start"); Mat mat =
+             * pool.getImage(idx); Log.v(TAG, "getImage end"); if (mat == null) { Log.v(TAG, "pool.getImage is null"); return; } Bitmap bitmap = matToBitmap(mat); FaceDetector faceDetector = new
+             * FaceDetector(bitmap.getWidth(), bitmap.getHeight(), faces.length); int num = faceDetector.findFaces(bitmap, faces); Log.v(TAG, num + " faces found.");
              */
-            faceRecognizer.recognize(idx, pool);
-
-            // call a function - this function does absolutely nothing!
-            // barbar.crazy();
-
-            // sample processor
-            // this gets called every frame in the order of the list
-            // first add to the callback stack linked list will be the
-            // first called
-            // the idx and pool may be used to get the cv::Mat
-            // that is the latest frame being passed.
-            // pool.getClass(idx)
+            brain.process(idx, pool, timestamp);
 
             // these are what the glview.getDrawCallback() calls
             glview.drawMatToGL(idx, pool);
@@ -237,15 +223,10 @@ public class MainActivity extends Activity {
     }
 
     public static Bitmap matToBitmap(Mat mat) {
-        Log.v(TAG, "cols=" + mat.getCols() + ", rows=" + mat.getRows() + ", channel=" + mat.channels());
         Bitmap bmap = Bitmap.createBitmap(mat.getCols(), mat.getRows(), Config.ARGB_8888);
-        Log.v(TAG, "test1");
         ByteBuffer buffer = ByteBuffer.allocate(24 * bmap.getWidth() * bmap.getHeight());
-        Log.v(TAG, buffer.remaining() + " remaining.");
         opencv.copyMatToBuffer(buffer, mat);
-        Log.v(TAG, "test3");
         bmap.copyPixelsFromBuffer(buffer);
-        Log.v(TAG, "test4");
         return bmap;
     }
 
@@ -266,7 +247,7 @@ public class MainActivity extends Activity {
 
         for (String file : fileList) {
             String outFileName = target + "/" + file;
-            Log.v("Face", "copy file:" + outFileName);
+            Log.v(TAG, "copy file:" + outFileName);
             input = as.open(outFileName);
             fos = openFileOutput(file, Context.MODE_WORLD_READABLE);
             bos = new BufferedOutputStream(fos);
@@ -283,5 +264,4 @@ public class MainActivity extends Activity {
             input.close();
         }
     }
-
 }

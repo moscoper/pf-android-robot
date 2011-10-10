@@ -16,7 +16,7 @@ using namespace cv;
 class HaarFaceDetector{
 public:
 	HaarFaceDetector(const char* haarcascadeFaceFile, const char* haarcascadeEyeFile, const char* haarcascadeMouthFile);
-	CvRect detectFace(IplImage* srcImage);
+	bool detectFace(IplImage* srcImage, CvRect* faceRect);
 private:
 	CvHaarClassifierCascade* cascade_face;
   CvHaarClassifierCascade* cascade_eye;

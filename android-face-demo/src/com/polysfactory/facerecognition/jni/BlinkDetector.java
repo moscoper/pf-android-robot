@@ -10,14 +10,14 @@ package com.polysfactory.facerecognition.jni;
 
 import com.opencv.jni.image_pool;// import the image_pool interface for playing nice with android-opencv
 
-public class FaceRecognizer {
+public class BlinkDetector {
   private long swigCPtr;
   protected boolean swigCMemOwn;
-  public FaceRecognizer(long cPtr, boolean cMemoryOwn) {
+  public BlinkDetector(long cPtr, boolean cMemoryOwn) {
 	swigCMemOwn = cMemoryOwn;
 	swigCPtr = cPtr;
   }
-  public static long getCPtr(FaceRecognizer obj) {
+  public static long getCPtr(BlinkDetector obj) {
 	return (obj == null) ? 0 : obj.swigCPtr;
   }
 
@@ -29,18 +29,18 @@ public class FaceRecognizer {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        NativeFaceRecognizerJNI.delete_FaceRecognizer(swigCPtr);
+        BlinkModuleJNI.delete_BlinkDetector(swigCPtr);
       }
       swigCPtr = 0;
     }
   }
 
-  public FaceRecognizer() {
-    this(NativeFaceRecognizerJNI.new_FaceRecognizer(), true);
+  public BlinkDetector() {
+    this(BlinkModuleJNI.new_BlinkDetector(), true);
   }
 
-  public int recognize(int idx, image_pool pool) {
-    return NativeFaceRecognizerJNI.FaceRecognizer_recognize(swigCPtr, this, idx, image_pool.getCPtr(pool), pool);
+  public void findFace(int input_idx, image_pool pool) {
+    BlinkModuleJNI.BlinkDetector_findFace(swigCPtr, this, input_idx, image_pool.getCPtr(pool), pool);
   }
 
 }

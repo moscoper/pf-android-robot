@@ -8,5 +8,5 @@
 
 package com.polysfactory.facerecognition.jni;
 
-public class NativeFaceRecognizer {
+public class BlinkModule {
 }

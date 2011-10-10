@@ -156,6 +156,7 @@ int ObjectMatcher::match (IplImage* queryImage) {
 	// tt = (double)cvGetTickCount() - tt;
 	// cout << "Recognition Time = " << tt / (cvGetTickFrequency() * 1000.0) << "ms" << endl;
 	
+  /*
 	if (maxVal > numKeypoints[maxId]/10) {
 		for (int i = 0; i < indices->rows; i++) {
 			int idx = CV_MAT_ELEM(*indices, int, i, 0);
@@ -176,7 +177,25 @@ int ObjectMatcher::match (IplImage* queryImage) {
 	} else {
 		maxId = -1;
 	}
-	
+   */
+
+  for (int i = 0; i < indices->rows; i++) {
+    int idx = CV_MAT_ELEM(*indices, int, i, 0);
+    double dist = CV_MAT_ELEM(*dists, double, i, 0);
+    if (idx < 0) {
+      // can't find nn
+      continue;
+    }
+    
+    if (dist < THRESHOLD) {
+      int id = getObjectId(idx);
+      if (id == maxId) {
+        CvSURFPoint* spt = (CvSURFPoint*)cvGetSeqElem(queryKeypoints, i);
+        cvCircle(queryImage, cvPoint((int)spt->pt.x, (int)spt->pt.y), 3, cvScalar(255, 0, 255, 0));
+      }
+    }
+  }
+  
 	// 後始末
 	cvReleaseMat(&indices);
 	cvReleaseMat(&dists);

@@ -44,26 +44,39 @@ int main (int argc, char** argv) {
     return -1;
   }
 
-  CvRect faceRect = haarFaceDetector->detectFace(grayImage);
-  cvSetImageROI(grayImage, faceRect);
+  CvRect faceRect;
+  bool find = haarFaceDetector->detectFace(grayImage, &faceRect);
+  if (find) {
+    cvSetImageROI(grayImage, faceRect);
 
-  CvMemStorage* storage = cvCreateMemStorage(0);
-  CvSeq* imageKeypoints = 0;
-  CvSeq* imageDescriptors = 0;
-  CvSURFParams params = cvSURFParams(500, 1);
-  
-  // 画像からSURFを取得
-  cvExtractSURF(grayImage, 0, &imageKeypoints, &imageDescriptors, storage, params);
-  LOGE("Image Descriptors: %d", imageDescriptors->total);
-  
-  // SURFをファイルに出力
-  writeSURF(imageKeypoints, imageDescriptors);
+    CvMemStorage* storage = cvCreateMemStorage(0);
+    CvSeq* imageKeypoints = 0;
+    CvSeq* imageDescriptors = 0;
+    CvSURFParams params = cvSURFParams(500, 1);
+    
+    // 画像からSURFを取得
+    cvExtractSURF(grayImage, 0, &imageKeypoints, &imageDescriptors, storage, params);
+    LOGE("Image Descriptors: %d", imageDescriptors->total);
+    
+    for (int i = 0; i < imageKeypoints->total; i++) {
+      CvSURFPoint* point = (CvSURFPoint*)cvGetSeqElem(imageKeypoints, i);
+      cvCircle(grayImage, cvPoint((int)point->pt.x, (int)point->pt.y), 3, cvScalar(255, 0, 255, 0));
+    }
+    
+    // SURFをファイルに出力
+    writeSURF(imageKeypoints, imageDescriptors);
+    
+    // 後始末
+    cvClearSeq(imageKeypoints);
+    cvClearSeq(imageDescriptors);
+    cvReleaseMemStorage(&storage);    
+  }
   
   // 後始末
+  cvShowImage("", grayImage);
+  cvWaitKey(0);
+  
   cvReleaseImage(&grayImage);
-  cvClearSeq(imageKeypoints);
-  cvClearSeq(imageDescriptors);
-  cvReleaseMemStorage(&storage);
   cvDestroyAllWindows();
   
   return 0;
