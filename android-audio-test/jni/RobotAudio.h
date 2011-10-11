@@ -8,7 +8,8 @@ using namespace soundtouch;
 using namespace std;
 
 // Processing chunk size
-#define BUFF_SIZE           2048
+//#define BUFF_SIZE           2048
+#define BUFF_SIZE           256
 
 // Not needed for GNU environment... 
 // #define SET_STREAM_TO_BIN_MODE(f) {}
