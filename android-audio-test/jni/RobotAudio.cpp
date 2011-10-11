@@ -69,31 +69,41 @@ void RobotAudio::process(SoundTouch *pSoundTouch, WavInFile *inFile, WavOutFile 
   buffSizeSamples = BUFF_SIZE / nChannels;
 
   // Process samples read from the input file
+  int counter = 0;
   while (inFile->eof() == 0)
   {
-      int num;
+    int num;
 
-      // Read a chunk of samples from the input file
-      num = inFile->read(sampleBuffer, BUFF_SIZE);
-      nSamples = num / (int)inFile->getNumChannels();
+    // Read a chunk of samples from the input file
+    num = inFile->read(sampleBuffer, BUFF_SIZE);
+    nSamples = num / (int)inFile->getNumChannels();
 
-      // Feed the samples into SoundTouch processor
-      pSoundTouch->putSamples(sampleBuffer, nSamples);
+    // Feed the samples into SoundTouch processor
+    pSoundTouch->putSamples(sampleBuffer, nSamples);
+      
+    if (counter % 400 == 0) {
+      // random select pitch
+      float pitch = (float)(rand()%60);
+      pSoundTouch->setPitchSemiTones(pitch);
+    }
+    
+    // Read ready samples from SoundTouch processor & write them output file.
+    // NOTES:
+    // - 'receiveSamples' doesn't necessarily return any samples at all
+    //   during some rounds!
+    // - On the other hand, during some round 'receiveSamples' may have more
+    //   ready samples than would fit into 'sampleBuffer', and for this reason 
+    //   the 'receiveSamples' call is iterated for as many times as it
+    //   outputs samples.
+    do 
+    {
+        nSamples = pSoundTouch->receiveSamples(sampleBuffer, buffSizeSamples);
+        outFile->write(sampleBuffer, nSamples * nChannels);
+    } while (nSamples != 0);
 
-      // Read ready samples from SoundTouch processor & write them output file.
-      // NOTES:
-      // - 'receiveSamples' doesn't necessarily return any samples at all
-      //   during some rounds!
-      // - On the other hand, during some round 'receiveSamples' may have more
-      //   ready samples than would fit into 'sampleBuffer', and for this reason 
-      //   the 'receiveSamples' call is iterated for as many times as it
-      //   outputs samples.
-      do 
-      {
-          nSamples = pSoundTouch->receiveSamples(sampleBuffer, buffSizeSamples);
-          outFile->write(sampleBuffer, nSamples * nChannels);
-      } while (nSamples != 0);
+    counter++;
   }
+  LOGD("total sampling count=%d", counter);
 
   // Now the input file is processed, yet 'flush' few last samples that are
   // hiding in the SoundTouch's internal processing pipeline.
