@@ -1,3 +1,3 @@
-1 /workspace/Face/train/pan2.jpg
-2 /workspace/Face/train/pan3.jpg
-3 /workspace/Face/train/takahiro3.jpg
+1 ../test/pan2.jpg
+2 ../test/pan3.jpg
+3 ../test/takahiro3.jpg
