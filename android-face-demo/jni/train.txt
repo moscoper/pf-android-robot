@@ -1,5 +1,11 @@
-1 /Users/horikawa/Dropbox/Private/cv2011/koga.jpg
-2 /Users/horikawa/Dropbox/Private/cv2011/koga.jpg
-3 /Users/horikawa/Dropbox/Private/cv2011/koga.jpg
-
-
+1 /workspace/Face/train/akita.jpg
+2 /workspace/Face/train/hosomi.jpg
+3 /workspace/Face/train/igari.jpg
+4 /workspace/Face/train/ito.jpg
+5 /workspace/Face/train/kei.jpg
+6 /workspace/Face/train/koga.jpg
+7 /workspace/Face/train/namikawa.jpg
+8 /workspace/Face/train/pan.jpg
+9 /workspace/Face/train/sato.jpg
+10 /workspace/Face/train/takahiro.jpg
+11 /workspace/Face/train/yamada.jpg

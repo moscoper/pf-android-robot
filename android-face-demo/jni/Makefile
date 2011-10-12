@@ -1,13 +1,16 @@
-CFLAGS = -I/usr/local/opencv-2.3.0/include
 LIBS = -L/usr/local/opencv-2.3.0/lib -lopencv_core -lopencv_highgui -lopencv_features2d -lopencv_imgproc -lopencv_objdetect -lopencv_legacy
+CFLAGS = -I/usr/local/opencv-2.3.0/include
 DEFS = -DSIMPLE
 
 dump: HaarFaceDetector.o FaceFeatureDump.o
-	g++ -o a.out $(LIBS) FaceFeatureDump.o HaarFaceDetector.o
+	g++ -o dump $(LIBS) FaceFeatureDump.o HaarFaceDetector.o
 match: FaceFeatureMatch.o HaarFaceDetector.o ObjectMatcher.o
-	g++ -o a.out $(LIBS) FaceFeatureMatch.o HaarFaceDetector.o ObjectMatcher.o
-eigen: EigenFace.cpp
-	g++ $(LIBS) EigenFace.cpp -o a.out
+	g++ -o match $(LIBS) FaceFeatureMatch.o HaarFaceDetector.o ObjectMatcher.o
+eigen: EigenFace.cpp HaarFaceDetector.o
+	g++ $(LIBS) $(CFLAGS) EigenFace.cpp -o eigen
+crop: FaceCrop.cpp
+	g++ $(CFLAGS) -c FaceCrop.cpp -o FaceCrop.o
+	g++ $(LIBS) $(CFLAGS) FaceCrop.o HaarFaceDetector.o -o crop
 FaceFeatureDump.o: FaceFeatureDump.cpp
 	g++ $(CFLAGS) -c FaceFeatureDump.cpp -o FaceFeatureDump.o
 FaceFeatureMatch.o: FaceFeatureMatch.cpp
