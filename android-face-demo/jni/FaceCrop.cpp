@@ -36,15 +36,15 @@ int main (int argc, char** argv) {
   CvRect faceRect;
   bool find = haarFaceDetector->detectFace(grayImage, &faceRect);
   if (find) {
-    //cvSetImageROI(grayImage, faceRect);
-    cvSetImageROI(colorImage, faceRect);
-    IplImage* faceImage = cvCreateImage(cvSize(faceRect.width, faceRect.height), IPL_DEPTH_8U, 3);
-    IplImage* resizedFaceImage = cvCreateImage(cvSize(FACE_WIDTH, FACE_HEIGHT), IPL_DEPTH_8U, 3);
-    cvCopy(colorImage, faceImage);
-    cvResize(faceImage, resizedFaceImage, CV_INTER_AREA);
+    cvSetImageROI(grayImage, faceRect);
+    //cvSetImageROI(colorImage, faceRect);
+    //IplImage* faceImage = cvCreateImage(cvSize(faceRect.width, faceRect.height), IPL_DEPTH_8U, 3);
+    IplImage* resizedFaceImage = cvCreateImage(cvSize(FACE_WIDTH, FACE_HEIGHT), IPL_DEPTH_8U, 1);
+    //cvCopy(colorImage, faceImage);
+    cvResize(grayImage, resizedFaceImage, CV_INTER_AREA);
     cvSaveImage(outFile, resizedFaceImage);
     
-    cvReleaseImage(&faceImage);
+    //cvReleaseImage(&faceImage);
     cvReleaseImage(&resizedFaceImage);
   }
     

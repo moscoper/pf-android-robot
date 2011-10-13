@@ -8,7 +8,7 @@ match: FaceFeatureMatch.o HaarFaceDetector.o ObjectMatcher.o
 	g++ -o match $(LIBS) FaceFeatureMatch.o HaarFaceDetector.o ObjectMatcher.o
 eigen: EigenFaceCUI.cpp HaarFaceDetector.o
 	g++ $(LIBS) $(CFLAGS) EigenFaceCUI.cpp -o eigen
-crop: FaceCrop.cpp
+crop: FaceCrop.cpp HaarFaceDetector.o
 	g++ $(CFLAGS) -c FaceCrop.cpp -o FaceCrop.o
 	g++ $(LIBS) $(CFLAGS) FaceCrop.o HaarFaceDetector.o -o crop
 FaceFeatureDump.o: FaceFeatureDump.cpp

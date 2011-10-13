@@ -6,6 +6,9 @@
 6 /workspace/Face/train/koga.jpg
 7 /workspace/Face/train/namikawa.jpg
 8 /workspace/Face/train/pan.jpg
+8 /workspace/Face/train/pan2.jpg
+8 /workspace/Face/train/pan3.jpg
 9 /workspace/Face/train/sato.jpg
 10 /workspace/Face/train/takahiro.jpg
+10 /workspace/Face/train/takahiro3.jpg
 11 /workspace/Face/train/yamada.jpg
