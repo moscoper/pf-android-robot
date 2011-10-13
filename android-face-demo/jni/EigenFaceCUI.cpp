@@ -329,7 +329,10 @@ int loadFaceImgArray(char * filename)
 			"%d %s", personNumTruthMat->data.i+iFace, imgFilename);
 
 		// load the face image
-		faceImgArr[iFace] = cvLoadImage(imgFilename, CV_LOAD_IMAGE_GRAYSCALE);
+    LOGD("load from %s", imgFilename);
+    IplImage* tmpImage = cvLoadImage(imgFilename, CV_LOAD_IMAGE_GRAYSCALE);
+    faceImgArr[iFace] = cvCloneImage(tmpImage);
+    cvEqualizeHist(tmpImage, faceImgArr[iFace]);
 
 		if( !faceImgArr[iFace] )
 		{

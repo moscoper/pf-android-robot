@@ -38,8 +38,10 @@ int EigenFace::recognize(IplImage* testFace)
 {
   float * projectedTestFace = 0;
 
-  IplImage* resizedFaceImage = cvCreateImage(cvSize(FACE_WIDTH, FACE_HEIGHT), IPL_DEPTH_8U, 1);
-  cvResize(testFace, resizedFaceImage, CV_INTER_AREA);
+  IplImage* tmpImage = cvCreateImage(cvSize(FACE_WIDTH, FACE_HEIGHT), IPL_DEPTH_8U, 1);
+  IplImage* resizedFaceImage = cvCloneImage(tmpImage);
+  cvResize(testFace, tmpImage, CV_INTER_AREA);
+  cvEqualizeHist(tmpImage, resizedFaceImage);
   
   // project the test images onto the PCA subspace
   projectedTestFace = (float *)cvAlloc( nEigens*sizeof(float) );
