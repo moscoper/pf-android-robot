@@ -21,6 +21,10 @@ FaceRecognizer::FaceRecognizer () {
   objectMatcher->loadDescription("/data/data/com.polysfactory.facerecognition/files/koga.txt");
   objectMatcher->loadDescription("/data/data/com.polysfactory.facerecognition/files/sato.txt");
   objectMatcher->loadDescription("/data/data/com.polysfactory.facerecognition/files/pan2.txt");
+  
+  //eigen face recognizer
+  eigenFace = new EigenFace("/data/data/com.polysfactory.facerecognition/files/facedata.xml");
+  
   cvInitFont(&font, CV_FONT_HERSHEY_DUPLEX, 1.0, 1.0, 0, 3, 8);
 }
 
@@ -53,7 +57,8 @@ int FaceRecognizer::recognize(int input_idx, image_pool* pool) {
   if (found) {
     cvRectangle(&srcImage, POINTS(faceRect), CV_RGB(255,255,0), 2, 8, 0);
     cvSetImageROI(&greyImage, faceRect);
-    int objId = objectMatcher->match(&greyImage);
+    //int objId = objectMatcher->match(&greyImage);
+    int objId = eigenFace->recognize(&greyImage);
     LOGD("objectId=%d", objId);
     char txt[256];
     sprintf(txt, "id=%d",objId);

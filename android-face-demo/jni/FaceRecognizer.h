@@ -13,6 +13,7 @@
 #include "image_pool.h"
 #include "HaarFaceDetector.h"
 #include "ObjectMatcher.h"
+#include "EigenFace.h"
 
 using namespace std;
 using namespace cv;
@@ -25,6 +26,7 @@ public:
 private:
   HaarFaceDetector* haarFaceDetector;
   ObjectMatcher* objectMatcher;
+  EigenFace* eigenFace;
   CvFont font;
 };
 

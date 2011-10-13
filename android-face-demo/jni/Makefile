@@ -6,8 +6,8 @@ dump: HaarFaceDetector.o FaceFeatureDump.o
 	g++ -o dump $(LIBS) FaceFeatureDump.o HaarFaceDetector.o
 match: FaceFeatureMatch.o HaarFaceDetector.o ObjectMatcher.o
 	g++ -o match $(LIBS) FaceFeatureMatch.o HaarFaceDetector.o ObjectMatcher.o
-eigen: EigenFace.cpp HaarFaceDetector.o
-	g++ $(LIBS) $(CFLAGS) EigenFace.cpp -o eigen
+eigen: EigenFaceCUI.cpp HaarFaceDetector.o
+	g++ $(LIBS) $(CFLAGS) EigenFaceCUI.cpp -o eigen
 crop: FaceCrop.cpp
 	g++ $(CFLAGS) -c FaceCrop.cpp -o FaceCrop.o
 	g++ $(LIBS) $(CFLAGS) FaceCrop.o HaarFaceDetector.o -o crop

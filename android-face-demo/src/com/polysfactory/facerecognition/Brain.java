@@ -176,7 +176,7 @@ public class Brain extends Thread {
         Log.d(TAG, "process:" + timestamp);
         timestamp = timestamp / (1000 * 1000);
         int objId = mFaceRecognizer.recognize(idx, pool);
-        String[] names = {"ぽりー", "アンノウン", "アンノウン", "アンノウン", "佐藤", "ハン" };
+        String[] names = {"不明", "秋田", "ホソミ", "イガリ", "伊藤", "中澤", "古賀", "ナミカワ", "ハン", "佐藤", "ぽりー", "山田", "ショウコ" };
         if (objId >= 0) {
             Log.d(TAG, "objId=" + objId + ",prevObjId=" + prevObjId + ",timediff=" + (timestamp - prevTime));
             if (timestamp - prevTime < 2000 && prevObjId == objId && !tts.isSpeaking()) {

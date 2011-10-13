@@ -57,7 +57,7 @@ SET_SOURCE_FILES_PROPERTIES(NativeFaceRecognizer.i PROPERTIES CPLUSPLUS ON)
 #add the swig module, giving it the name, java, and then all of the source files
 SWIG_ADD_MODULE(FaceRecognizer java 
                 NativeFaceRecognizer.i #swig file
-                FaceRecognizer.cpp HaarFaceDetector.cpp ObjectMatcher.cpp BlinkDetector.cpp #cpp files can be compiled to
+                FaceRecognizer.cpp HaarFaceDetector.cpp ObjectMatcher.cpp BlinkDetector.cpp EigenFace.cpp #cpp files can be compiled to
                 )
 
 #SWIG_ADD_MODULE(BlinkDetector java 
