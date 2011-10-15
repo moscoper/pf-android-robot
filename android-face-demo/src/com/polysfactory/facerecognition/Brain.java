@@ -8,6 +8,7 @@ import android.speech.tts.TextToSpeech.OnInitListener;
 import android.util.Log;
 
 import com.opencv.jni.image_pool;
+import com.polysfactory.facerecognition.behavior.BehaviorManager;
 import com.polysfactory.facerecognition.jni.FaceRecognizer;
 
 /**
@@ -57,6 +58,8 @@ public class Brain extends Thread {
     /** 直前した検出したオブジェクトのID */
     int prevObjId = -1;
 
+    BehaviorManager mBehaviorPool;
+
     /**
      * コンストラクタ<br>
      * @param usbCommander
@@ -65,6 +68,7 @@ public class Brain extends Thread {
         mContext = context;
         mUsbCommander = usbCommander;
         mFaceRecognizer = new FaceRecognizer();
+        mBehaviorPool = new BehaviorManager(usbCommander);
         // setup TextToSpeech object
         tts = new TextToSpeech(context, new OnInitListener() {
             @Override
@@ -222,30 +226,19 @@ public class Brain extends Thread {
     @Override
     public void run() {
         while (true) {
-            int interval = 16;
-            // double d = Math.random() * 2;
-            // interval = (int) (((double) interval) * d);
-            int commandId = (int) (Math.random() * 3);
-            switch (commandId) {
-            case 0:
-                degreeAdd(0, interval);
-                break;
-            case 1:
-                degreeAdd(1, interval);
-                break;
-            case 2:
-                degreeAdd(2, interval);
-                break;
-            // case 3:
-            // nextEye();
-            // break;
-            // }
-            }
-            try {
-                Thread.sleep(450);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            /*
+             * int interval = 16; // double d = Math.random() * 2; // interval = (int) (((double) interval) * d); int commandId = (int) (Math.random() * 3); switch (commandId) { case 0: degreeAdd(0,
+             * interval); break; case 1: degreeAdd(1, interval); break; case 2: degreeAdd(2, interval); break; // case 3: // nextEye(); // break; // } }
+             */
+            mySleep(450);
+        }
+    }
+
+    public void mySleep(long mills) {
+        try {
+            Thread.sleep(mills);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }
