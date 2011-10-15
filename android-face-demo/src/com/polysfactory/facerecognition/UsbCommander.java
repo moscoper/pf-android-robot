@@ -16,6 +16,7 @@ import android.util.Log;
 import com.android.future.usb.UsbAccessory;
 import com.android.future.usb.UsbManager;
 import com.polysfactory.facerecognition.usbprotocol.LedCommand;
+import com.polysfactory.facerecognition.usbprotocol.MotorCommand;
 import com.polysfactory.facerecognition.usbprotocol.ServoCommand;
 
 /**
@@ -208,7 +209,7 @@ public class UsbCommander extends BroadcastReceiver {
             }
         }
     }
-    
+
     public void lightLed(int red, int green, int blue) {
         Log.d(TAG, "lightLed:(" + red + "," + green + "," + blue + ")");
         if (mOutputStream != null) {
@@ -217,6 +218,47 @@ public class UsbCommander extends BroadcastReceiver {
             ledCommand.setLedScale(1, red, green, blue);
             try {
                 mOutputStream.write(ledCommand.toBytes());
+            } catch (IOException e) {
+                Log.e(TAG, "rotateLeftHandError", e);
+            }
+        }
+    }
+
+    /**  */
+    public void pivotTurnRight() {
+        issueMotorCommand((byte) (MotorCommand.motor1Forward | MotorCommand.motor2Stop));
+    }
+
+    public void pivotTurnLeft() {
+        issueMotorCommand((byte) (MotorCommand.motor2Forward | MotorCommand.motor1Stop));
+    }
+
+    public void spinTurnRight() {
+        issueMotorCommand((byte) (MotorCommand.motor1Forward | MotorCommand.motor2Backward));
+    }
+
+    public void spinTurnLeft() {
+        issueMotorCommand((byte) (MotorCommand.motor2Forward | MotorCommand.motor1Backward));
+    }
+
+    public void forward() {
+        issueMotorCommand((byte) (MotorCommand.motor1Forward | MotorCommand.motor2Forward));
+    }
+
+    public void backward() {
+        issueMotorCommand((byte) (MotorCommand.motor1Backward | MotorCommand.motor2Backward));
+    }
+
+    public void stop() {
+        issueMotorCommand((byte) (MotorCommand.motor1Stop | MotorCommand.motor2Stop));
+    }
+
+    private void issueMotorCommand(byte command) {
+        if (mOutputStream != null) {
+            MotorCommand mc = new MotorCommand();
+            mc.setCommandByte(command);
+            try {
+                mOutputStream.write(mc.toBytes());
             } catch (IOException e) {
                 Log.e(TAG, "rotateLeftHandError", e);
             }

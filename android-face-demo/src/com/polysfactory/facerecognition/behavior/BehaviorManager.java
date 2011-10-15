@@ -19,6 +19,7 @@ public class BehaviorManager {
     public BehaviorManager(UsbCommander usbCommander) {
         mUsbCommander = usbCommander;
         behaviorVector = new Vector<IBehavior>();
+        behaviorVector.add(new Greeting(usbCommander));
         behaviorVector.add(new UroUro(usbCommander));
     }
 

@@ -1,14 +1,22 @@
 package com.polysfactory.facerecognition;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.util.Log;
 
 import com.opencv.jni.image_pool;
 import com.polysfactory.facerecognition.behavior.BehaviorManager;
+import com.polysfactory.facerecognition.behavior.IBehavior;
 import com.polysfactory.facerecognition.jni.FaceRecognizer;
 
 /**
@@ -58,7 +66,13 @@ public class Brain extends Thread {
     /** 直前した検出したオブジェクトのID */
     int prevObjId = -1;
 
-    BehaviorManager mBehaviorPool;
+    BehaviorManager mBehaviorManager;
+
+    SpeechRecognizer sr;
+
+    Handler handler = new Handler();
+
+    Intent intent = new Intent();
 
     /**
      * コンストラクタ<br>
@@ -68,7 +82,7 @@ public class Brain extends Thread {
         mContext = context;
         mUsbCommander = usbCommander;
         mFaceRecognizer = new FaceRecognizer();
-        mBehaviorPool = new BehaviorManager(usbCommander);
+        mBehaviorManager = new BehaviorManager(usbCommander);
         // setup TextToSpeech object
         tts = new TextToSpeech(context, new OnInitListener() {
             @Override
@@ -87,7 +101,120 @@ public class Brain extends Thread {
                 }
             }
         });
+        initSpeechRecognizer();
         // this.start();
+    }
+
+    void initSpeechRecognizer() {
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        sr = SpeechRecognizer.createSpeechRecognizer(mContext);
+        sr.setRecognitionListener(new RecognitionListener() {
+            @Override
+            public void onRmsChanged(float rmsdB) {
+                // TODO Auto-generated method stub
+                // Log.d(TAG, "onRmsChanged");
+            }
+
+            @Override
+            public void onResults(Bundle results) {
+                // TODO Auto-generated method stub
+                Log.d(TAG, "onResults");
+                ArrayList<String> array = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+                for (String s : array) {
+                    Log.d(TAG, s);
+                }
+
+                if (array.size() > 0) {
+                    actionOnListening(array);
+                }
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        sr.startListening(intent);
+                    }
+                }, 0);
+            }
+
+            @Override
+            public void onReadyForSpeech(Bundle params) {
+                // TODO Auto-generated method stub
+                Log.d(TAG, "onReadyForSpeech");
+            }
+
+            @Override
+            public void onPartialResults(Bundle partialResults) {
+                // TODO Auto-generated method stub
+                Log.d(TAG, "onPartialResults");
+            }
+
+            @Override
+            public void onEvent(int eventType, Bundle params) {
+                // TODO Auto-generated method stub
+                Log.d(TAG, "onEvent");
+            }
+
+            @Override
+            public void onError(int error) {
+                // TODO Auto-generated method stub
+                Log.d(TAG, "onError:" + error);
+                if (error != SpeechRecognizer.ERROR_RECOGNIZER_BUSY) {
+                    int delayed = 0;
+                    if (error == SpeechRecognizer.ERROR_NETWORK) {
+                        delayed = 10000;
+                    }
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            sr.startListening(intent);
+                        }
+                    }, delayed);
+                }
+            }
+
+            @Override
+            public void onEndOfSpeech() {
+                // TODO Auto-generated method stub
+                Log.d(TAG, "onEndOfSpeech");
+            }
+
+            @Override
+            public void onBufferReceived(byte[] buffer) {
+                // TODO Auto-generated method stub
+                // Log.d(TAG, "onBurfferReceived");
+            }
+
+            @Override
+            public void onBeginningOfSpeech() {
+                // TODO Auto-generated method stub
+                Log.d(TAG, "onBeginningOfSpeech");
+            }
+        });
+        sr.startListening(intent);
+    }
+
+    /**
+     * 言葉の入力に対するアクションを行う<br>
+     * @param text 入力文字列
+     */
+    void actionOnListening(ArrayList<String> array) {
+        int len = Math.min(3, array.size());
+        for (int i = 0; i < len; i++) {
+            String text = array.get(i);
+            Log.d(App.TAG, "actionOnListening:" + text);
+            if (text.contains("前進") || text.contains("進め") || text.contains("進んで") || text.contains("ゴー")) {
+                mUsbCommander.forward();
+                break;
+            } else if (text.contains("停止") || text.contains("止まれ") || text.contains("止まって") || text.contains("ストップ")) {
+                mUsbCommander.stop();
+                break;
+            } else if (text.contains("後退") || text.contains("戻れ") || text.contains("戻って") || text.contains("バック")) {
+                mUsbCommander.backward();
+                break;
+            } else if (text.contains("旋回") || text.contains("回れ") || text.contains("回って")) {
+                mUsbCommander.spinTurnLeft();
+                break;
+            }
+        }
     }
 
     void nextEye() {
@@ -230,6 +357,8 @@ public class Brain extends Thread {
              * int interval = 16; // double d = Math.random() * 2; // interval = (int) (((double) interval) * d); int commandId = (int) (Math.random() * 3); switch (commandId) { case 0: degreeAdd(0,
              * interval); break; case 1: degreeAdd(1, interval); break; case 2: degreeAdd(2, interval); break; // case 3: // nextEye(); // break; // } }
              */
+            IBehavior behavior = mBehaviorManager.getBehavior();
+            behavior.action();
             mySleep(450);
         }
     }
