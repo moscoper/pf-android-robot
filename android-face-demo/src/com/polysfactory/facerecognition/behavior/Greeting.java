@@ -5,6 +5,11 @@ import android.util.Log;
 import com.polysfactory.facerecognition.App;
 import com.polysfactory.facerecognition.UsbCommander;
 
+/**
+ * あいさつの振る舞い<br>
+ * @author $Author$
+ * @version $Revision$
+ */
 public class Greeting implements IBehavior {
 
     int mPhase;

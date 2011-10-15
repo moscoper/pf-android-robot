@@ -25,8 +25,6 @@ import com.polysfactory.facerecognition.usbprotocol.ServoCommand;
  * @version $Revision$
  */
 public class UsbCommander extends BroadcastReceiver {
-    /** タグ */
-    private static final String TAG = "PFFaceDetector_Java";
 
     private static final String ACTION_USB_PERMISSION = "com.polysfactory.androidkun.USB_PERMISSION";
 
@@ -69,11 +67,11 @@ public class UsbCommander extends BroadcastReceiver {
     public void reopen() {
         // USBアクセサリ関連
         if (mInputStream == null || mOutputStream == null) {
-            Log.d(TAG, "reopen");
+            Log.d(App.TAG, "reopen");
             UsbAccessory[] accessories = mUsbManager.getAccessoryList();
             UsbAccessory accessory = (accessories == null ? null : accessories[0]);
             if (accessory != null) {
-                Log.d(TAG, "accessory is not null");
+                Log.d(App.TAG, "accessory is not null");
                 if (mUsbManager.hasPermission(accessory)) {
                     this.openAccessory(accessory);
                 } else {
@@ -85,7 +83,7 @@ public class UsbCommander extends BroadcastReceiver {
                     }
                 }
             } else {
-                Log.d(TAG, "mAccessory is null");
+                Log.d(App.TAG, "mAccessory is null");
             }
         }
     }
@@ -95,7 +93,7 @@ public class UsbCommander extends BroadcastReceiver {
      * @param accessory
      */
     public void openAccessory(UsbAccessory accessory) {
-        Log.d(TAG, "open USBAccessory");
+        Log.d(App.TAG, "open USBAccessory");
         mFileDescriptor = mUsbManager.openAccessory(accessory);
         if (mFileDescriptor != null) {
             mAccessory = accessory;
@@ -104,10 +102,10 @@ public class UsbCommander extends BroadcastReceiver {
             mOutputStream = new FileOutputStream(fd);
             // Thread thread = new Thread(null, this, "DemoKit");
             // thread.start();
-            Log.d(TAG, "accessory opened");
+            Log.d(App.TAG, "accessory opened");
             enableControls(true);
         } else {
-            Log.d(TAG, "accessory open fail");
+            Log.d(App.TAG, "accessory open fail");
         }
     }
 
@@ -115,7 +113,7 @@ public class UsbCommander extends BroadcastReceiver {
      * USBアクセサリをクローズする<br>
      */
     public void closeAccessory() {
-        Log.d(TAG, "close USBAccessory");
+        Log.d(App.TAG, "close USBAccessory");
         enableControls(false);
 
         try {
@@ -138,7 +136,7 @@ public class UsbCommander extends BroadcastReceiver {
                 if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                     this.openAccessory(accessory);
                 } else {
-                    Log.d(TAG, "permission denied for accessory " + accessory);
+                    Log.d(App.TAG, "permission denied for accessory " + accessory);
                 }
                 mPermissionRequestPending = false;
             }
@@ -158,7 +156,7 @@ public class UsbCommander extends BroadcastReceiver {
      * @param degree
      */
     public void rotateLeftHand(int degree) {
-        Log.d(TAG, "rotateLeftHand:" + degree);
+        Log.d(App.TAG, "rotateLeftHand:" + degree);
         rotateServo(0, degree);
     }
 
@@ -167,7 +165,7 @@ public class UsbCommander extends BroadcastReceiver {
      * @param degree
      */
     public void rotateRightHand(int degree) {
-        Log.d(TAG, "rotateRightHand:" + degree);
+        Log.d(App.TAG, "rotateRightHand:" + degree);
         rotateServo(1, degree);
     }
 
@@ -176,7 +174,7 @@ public class UsbCommander extends BroadcastReceiver {
      * @param degree
      */
     public void rotateNeck(int degree) {
-        Log.d(TAG, "rotateNeck:" + degree);
+        Log.d(App.TAG, "rotateNeck:" + degree);
         rotateServo(2, degree);
     }
 
@@ -192,7 +190,7 @@ public class UsbCommander extends BroadcastReceiver {
             try {
                 mOutputStream.write(servoCommand.toBytes());
             } catch (IOException e) {
-                Log.e(TAG, "rotateLeftHandError", e);
+                Log.e(App.TAG, "rotateLeftHandError", e);
             }
         }
     }
@@ -205,13 +203,13 @@ public class UsbCommander extends BroadcastReceiver {
             try {
                 mOutputStream.write(ledCommand.toBytes());
             } catch (IOException e) {
-                Log.e(TAG, "rotateLeftHandError", e);
+                Log.e(App.TAG, "rotateLeftHandError", e);
             }
         }
     }
 
     public void lightLed(int red, int green, int blue) {
-        Log.d(TAG, "lightLed:(" + red + "," + green + "," + blue + ")");
+        Log.d(App.TAG, "lightLed:(" + red + "," + green + "," + blue + ")");
         if (mOutputStream != null) {
             LedCommand ledCommand = new LedCommand();
             ledCommand.setLedScale(0, red, green, blue);
@@ -219,7 +217,7 @@ public class UsbCommander extends BroadcastReceiver {
             try {
                 mOutputStream.write(ledCommand.toBytes());
             } catch (IOException e) {
-                Log.e(TAG, "rotateLeftHandError", e);
+                Log.e(App.TAG, "rotateLeftHandError", e);
             }
         }
     }
@@ -260,7 +258,7 @@ public class UsbCommander extends BroadcastReceiver {
             try {
                 mOutputStream.write(mc.toBytes());
             } catch (IOException e) {
-                Log.e(TAG, "rotateLeftHandError", e);
+                Log.e(App.TAG, "rotateLeftHandError", e);
             }
         }
     }

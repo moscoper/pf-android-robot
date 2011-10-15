@@ -41,9 +41,6 @@ import com.opencv.opengl.GL2CameraViewer;
  */
 public class MainActivity extends Activity {
 
-    /** タグ */
-    private static final String TAG = "PFFaceDetector_Java";
-
     private final int FOOBARABOUT = 0;
 
     UsbCommander mUsbCommander;
@@ -55,7 +52,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         try {
-            Log.d(TAG, "copy keypoints file");
+            Log.d(App.TAG, "copy keypoints file");
             copy2Local("haarcascades");
             copy2Local("features");
         } catch (IOException e) {
@@ -247,7 +244,7 @@ public class MainActivity extends Activity {
 
         for (String file : fileList) {
             String outFileName = target + "/" + file;
-            Log.v(TAG, "copy file:" + outFileName);
+            Log.v(App.TAG, "copy file:" + outFileName);
             input = as.open(outFileName);
             fos = openFileOutput(file, Context.MODE_WORLD_READABLE);
             bos = new BufferedOutputStream(fos);

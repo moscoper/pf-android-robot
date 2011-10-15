@@ -46,9 +46,6 @@ public class Brain extends Thread {
     /** 目の色 */
     int eyeColor = 0;
 
-    /** タグ */
-    private static final String TAG = "PFFaceDetector_Java";
-
     /** コンテキスト */
     Context mContext;
 
@@ -96,7 +93,7 @@ public class Brain extends Thread {
                         tts.setPitch(0.5F);
                         tts.setSpeechRate(0.7F);
                     } else {
-                        Log.e(TAG, "Error SetLocale");
+                        Log.e(App.TAG, "Error SetLocale");
                     }
                 }
             }
@@ -112,16 +109,16 @@ public class Brain extends Thread {
             @Override
             public void onRmsChanged(float rmsdB) {
                 // TODO Auto-generated method stub
-                // Log.d(TAG, "onRmsChanged");
+                // Log.d(App.TAG, "onRmsChanged");
             }
 
             @Override
             public void onResults(Bundle results) {
                 // TODO Auto-generated method stub
-                Log.d(TAG, "onResults");
+                Log.d(App.TAG, "onResults");
                 ArrayList<String> array = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
                 for (String s : array) {
-                    Log.d(TAG, s);
+                    Log.d(App.TAG, s);
                 }
 
                 if (array.size() > 0) {
@@ -138,25 +135,25 @@ public class Brain extends Thread {
             @Override
             public void onReadyForSpeech(Bundle params) {
                 // TODO Auto-generated method stub
-                Log.d(TAG, "onReadyForSpeech");
+                Log.d(App.TAG, "onReadyForSpeech");
             }
 
             @Override
             public void onPartialResults(Bundle partialResults) {
                 // TODO Auto-generated method stub
-                Log.d(TAG, "onPartialResults");
+                Log.d(App.TAG, "onPartialResults");
             }
 
             @Override
             public void onEvent(int eventType, Bundle params) {
                 // TODO Auto-generated method stub
-                Log.d(TAG, "onEvent");
+                Log.d(App.TAG, "onEvent");
             }
 
             @Override
             public void onError(int error) {
                 // TODO Auto-generated method stub
-                Log.d(TAG, "onError:" + error);
+                Log.d(App.TAG, "onError:" + error);
                 if (error != SpeechRecognizer.ERROR_RECOGNIZER_BUSY) {
                     int delayed = 0;
                     if (error == SpeechRecognizer.ERROR_NETWORK) {
@@ -174,19 +171,19 @@ public class Brain extends Thread {
             @Override
             public void onEndOfSpeech() {
                 // TODO Auto-generated method stub
-                Log.d(TAG, "onEndOfSpeech");
+                Log.d(App.TAG, "onEndOfSpeech");
             }
 
             @Override
             public void onBufferReceived(byte[] buffer) {
                 // TODO Auto-generated method stub
-                // Log.d(TAG, "onBurfferReceived");
+                // Log.d(App.TAG, "onBurfferReceived");
             }
 
             @Override
             public void onBeginningOfSpeech() {
                 // TODO Auto-generated method stub
-                Log.d(TAG, "onBeginningOfSpeech");
+                Log.d(App.TAG, "onBeginningOfSpeech");
             }
         });
         sr.startListening(intent);
@@ -303,12 +300,12 @@ public class Brain extends Thread {
      * @param timestamp
      */
     public void process(int idx, image_pool pool, long timestamp) {
-        Log.d(TAG, "process:" + timestamp);
+        Log.d(App.TAG, "process:" + timestamp);
         timestamp = timestamp / (1000 * 1000);
         int objId = mFaceRecognizer.recognize(idx, pool);
         String[] names = {"不明", "秋田", "ホソミ", "イガリ", "伊藤", "中澤", "古賀", "ナミカワ", "ハン", "佐藤", "ポリー", "山田", "ショウコ" };
         if (objId >= 0) {
-            Log.d(TAG, "objId=" + objId + ",prevObjId=" + prevObjId + ",timediff=" + (timestamp - prevTime));
+            Log.d(App.TAG, "objId=" + objId + ",prevObjId=" + prevObjId + ",timediff=" + (timestamp - prevTime));
             if (timestamp - prevTime < 2000 && prevObjId == objId && !tts.isSpeaking()) {
                 // // for test
                 if (turn % 2 == 0) {
