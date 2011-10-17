@@ -5,8 +5,8 @@ import android.provider.BaseColumns;
 
 /**
  * 独自のコンテンツプロバイダーのメタ情報クラス
- * @author $Author: pan_j $
- * @version $Revision: 2212 $
+ * @author $Author$
+ * @version $Revision$
  */
 public class ContactPhotoStore {
     /** AUTHORITY */
@@ -17,8 +17,8 @@ public class ContactPhotoStore {
 
     /**
      * Downloadメタ情報
-     * @author $Author: pan_j $
-     * @version $Revision: 2212 $
+     * @author $Author$
+     * @version $Revision$
      */
     public static final class ContactPhoto implements ContactPhotoColumns {
 
@@ -29,8 +29,8 @@ public class ContactPhotoStore {
 
     /**
      * Download Columns
-     * @author $Author: pan_j $
-     * @version $Revision: 2212 $
+     * @author $Author$
+     * @version $Revision$
      */
     public static interface ContactPhotoColumns extends BaseColumns {
         /** 連絡先ID */

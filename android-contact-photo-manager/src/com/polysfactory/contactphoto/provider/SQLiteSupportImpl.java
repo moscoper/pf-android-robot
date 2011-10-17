@@ -9,8 +9,8 @@ import com.polysfactory.contactphoto.util.Log;
 
 /**
  * 独自のコンテンツプロバイダーのSQLite周りのヘルパークラス
- * @author $Author: horikawa_t $
- * @version $Revision: 2133 $
+ * @author $Author$
+ * @version $Revision$
  */
 public class SQLiteSupportImpl extends SQLiteOpenHelper {
 

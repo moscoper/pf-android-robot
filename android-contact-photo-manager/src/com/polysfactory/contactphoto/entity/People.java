@@ -2,8 +2,8 @@ package com.polysfactory.contactphoto.entity;
 
 /**
  * コンタクトPeopleエンティティ
- * @author $Author: horikawa_t $
- * @version $Revision: 725 $
+ * @author $Author$
+ * @version $Revision$
  */
 public class People implements Comparable<People> {
 

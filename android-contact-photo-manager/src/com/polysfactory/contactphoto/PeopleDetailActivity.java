@@ -25,8 +25,8 @@ import com.polysfactory.contactphoto.util.Log;
 
 /**
  * 個別詳細画面
- * @author $Author: ueda_n $
- * @version $Revision: 920 $
+ * @author $Author$
+ * @version $Revision$
  */
 public class PeopleDetailActivity extends Activity {
 

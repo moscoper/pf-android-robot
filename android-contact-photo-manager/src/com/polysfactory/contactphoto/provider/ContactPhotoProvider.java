@@ -15,8 +15,8 @@ import com.polysfactory.contactphoto.util.Log;
 
 /**
  * 独自のコンテンツプロバイダー
- * @author $Author: pan_j $
- * @version $Revision: 2212 $
+ * @author $Author$
+ * @version $Revision$
  */
 public class ContactPhotoProvider extends ContentProvider {
 
