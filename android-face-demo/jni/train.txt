@@ -9,6 +9,7 @@
 8 ../train/pan2.jpg
 8 ../train/pan3.jpg
 9 ../train/sato.jpg
+9 ../train/sato2.jpg
 10 ../train/takahiro.jpg
 10 ../train/takahiro3.jpg
 10 ../train/takahiro4.jpg

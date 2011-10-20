@@ -12,9 +12,14 @@
  */
 class EigenFace {
 public:
-  EigenFace(const char* trainingDataFile);
+  EigenFace(char* trainingDataFile);
+  void learn(char* trainFileName);
   int recognize(IplImage* testFace);
+  int loadTrainingData();
 private:
+  char mTrainingDataFile[256];
+  IplImage* preProcess(IplImage* testFace);
+  void storeTrainingData();
   int  findNearestNeighbor(float * projectedTestFace);
   IplImage ** faceImgArr;
   CvMat    *  personNumTruthMat;
@@ -25,4 +30,6 @@ private:
   CvMat * eigenValMat;
   CvMat * projectedTrainFaceMat;
   CvMat * trainPersonNumMat;
+  void doPCA();
+  int loadFaceImgArray(char * filename);
 };

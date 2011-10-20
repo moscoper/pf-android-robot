@@ -21,6 +21,7 @@ public class BehaviorManager {
         behaviorVector = new Vector<IBehavior>();
         behaviorVector.add(new Greeting(usbCommander));
         behaviorVector.add(new UroUro(usbCommander));
+        behaviorVector.add(new KyoroKyoro(usbCommander));
     }
 
     private IBehavior getNewBehavior() {

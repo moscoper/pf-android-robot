@@ -1,12 +1,19 @@
 package com.polysfactory.facerecognition;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import org.apache.http.client.utils.CloneUtils;
+
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore.Audio.Media;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -18,6 +25,7 @@ import com.opencv.jni.image_pool;
 import com.polysfactory.facerecognition.behavior.BehaviorManager;
 import com.polysfactory.facerecognition.behavior.IBehavior;
 import com.polysfactory.facerecognition.jni.FaceRecognizer;
+import com.polysfactory.robotaudio.jni.RobotAudio;
 
 /**
  * ロボットの自律的な行動を制御するためのクラス<br>
@@ -70,6 +78,12 @@ public class Brain extends Thread {
     Handler handler = new Handler();
 
     Intent intent = new Intent();
+
+    MediaPlayer mp = null;
+
+    RobotAudio robotAudio = new RobotAudio();
+    
+    volatile boolean stopThread = false;
 
     /**
      * コンストラクタ<br>
@@ -199,17 +213,40 @@ public class Brain extends Thread {
             String text = array.get(i);
             Log.d(App.TAG, "actionOnListening:" + text);
             if (text.contains("前進") || text.contains("進め") || text.contains("進んで") || text.contains("ゴー")) {
-                mUsbCommander.forward();
+                stopThread = true;
+                stopMusic();
+                if (mUsbCommander != null) {
+                    mUsbCommander.forward();
+                }
                 break;
             } else if (text.contains("停止") || text.contains("止まれ") || text.contains("止まって") || text.contains("ストップ")) {
-                mUsbCommander.stop();
+                stopThread = true;
+                stopMusic();
+                if (mUsbCommander != null) {
+                    mUsbCommander.stop();
+                }
                 break;
             } else if (text.contains("後退") || text.contains("戻れ") || text.contains("戻って") || text.contains("バック")) {
-                mUsbCommander.backward();
+                stopThread = true;
+                stopMusic();
+                if (mUsbCommander != null) {
+                    mUsbCommander.backward();
+                }
                 break;
             } else if (text.contains("旋回") || text.contains("回れ") || text.contains("回って")) {
-                mUsbCommander.spinTurnLeft();
+                stopThread = true;
+                stopMusic();
+                if (mUsbCommander != null) {
+                    mUsbCommander.spinTurnLeft();
+                }
                 break;
+            } else if (text.contains("こんにちわ")) {
+                stopThread = true;
+                speakByRobotVoie("こんにちわ");
+                break;
+            } else if (text.contains("踊れ") || text.contains("踊って")) {
+                playMusic(ContentUris.withAppendedId(Media.EXTERNAL_CONTENT_URI, 29));
+                this.start();
             }
         }
     }
@@ -222,7 +259,9 @@ public class Brain extends Thread {
         // } else if (eyeColor == (3 << 2)) {
         // eyeColor = 3;
         // }
-        mUsbCommander.lightLed(eyeColor);
+        if (mUsbCommander != null) {
+            mUsbCommander.lightLed(eyeColor);
+        }
         eyeColor++;
         if (eyeColor >= 64) {
             eyeColor = 0;
@@ -271,7 +310,9 @@ public class Brain extends Thread {
                 originalDegree -= addedDegree;
             }
         }
-        mUsbCommander.rotateServo(objectId, originalDegree);
+        if (mUsbCommander != null) {
+            mUsbCommander.rotateServo(objectId, originalDegree);
+        }
         switch (objectId) {
         case 0:
             leftHandDegere = originalDegree;
@@ -309,11 +350,16 @@ public class Brain extends Thread {
             if (timestamp - prevTime < 2000 && prevObjId == objId && !tts.isSpeaking()) {
                 // // for test
                 if (turn % 2 == 0) {
-                    mUsbCommander.rotateNeck(63);
+                    if (mUsbCommander != null) {
+                        mUsbCommander.rotateNeck(63);
+                    }
                 } else {
-                    mUsbCommander.rotateLeftHand(0);
+                    if (mUsbCommander != null) {
+                        mUsbCommander.rotateLeftHand(0);
+                    }
                 }
-                tts.speak("こんにちは" + names[objId] + "さん！", TextToSpeech.QUEUE_FLUSH, null);
+                // tts.speak("こんにちは" + names[objId] + "さん！", TextToSpeech.QUEUE_FLUSH, null);
+                speakByRobotVoie("こんにちは" + names[objId] + "さん！");
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -321,9 +367,13 @@ public class Brain extends Thread {
                     e.printStackTrace();
                 }
                 if (turn % 2 == 0) {
-                    mUsbCommander.rotateNeck(32);
+                    if (mUsbCommander != null) {
+                        mUsbCommander.rotateNeck(32);
+                    }
                 } else {
-                    mUsbCommander.rotateLeftHand(43);
+                    if (mUsbCommander != null) {
+                        mUsbCommander.rotateLeftHand(43);
+                    }
                 }
                 turn++;
                 // mUsbCommander.rotateRightHand(60);
@@ -349,7 +399,11 @@ public class Brain extends Thread {
 
     @Override
     public void run() {
+        stopThread = false;
         while (true) {
+            if (stopThread) {
+                break;
+            }
             /*
              * int interval = 16; // double d = Math.random() * 2; // interval = (int) (((double) interval) * d); int commandId = (int) (Math.random() * 3); switch (commandId) { case 0: degreeAdd(0,
              * interval); break; case 1: degreeAdd(1, interval); break; case 2: degreeAdd(2, interval); break; // case 3: // nextEye(); // break; // } }
@@ -365,6 +419,65 @@ public class Brain extends Thread {
             Thread.sleep(mills);
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void speakByRobotVoie(String text) {
+        tts.synthesizeToFile(text, null, "/sdcard/poly.wav");
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e1) {
+            // TODO 自動生成された catch ブロック
+            e1.printStackTrace();
+        }
+        robotAudio.pitchShift(0);
+        if (mp != null) {
+            mp.release();
+            mp = null;
+        }
+        mp = new MediaPlayer();
+        try {
+            mp.setDataSource("/sdcard/robot.wav");
+            mp.prepare();
+        } catch (IllegalArgumentException e) {
+            // TODO 自動生成された catch ブロック
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            // TODO 自動生成された catch ブロック
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO 自動生成された catch ブロック
+            e.printStackTrace();
+        }
+        mp.start();
+    }
+
+    public void playMusic(Uri audioUri) {
+        if (mp != null) {
+            mp.release();
+            mp = null;
+        }
+        mp = new MediaPlayer();
+        try {
+            mp.setDataSource(mContext, audioUri);
+            mp.prepare();
+        } catch (IllegalArgumentException e) {
+            // TODO 自動生成された catch ブロック
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            // TODO 自動生成された catch ブロック
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO 自動生成された catch ブロック
+            e.printStackTrace();
+        }
+        mp.start();
+    }
+
+    public void stopMusic() {
+        if (mp != null) {
+            mp.release();
+            mp = null;
         }
     }
 }

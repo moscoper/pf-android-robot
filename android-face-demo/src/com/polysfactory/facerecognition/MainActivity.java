@@ -43,9 +43,11 @@ public class MainActivity extends Activity {
 
     private final int FOOBARABOUT = 0;
 
-    UsbCommander mUsbCommander;
+    UsbCommander mUsbCommander = null;
 
     Brain brain;
+
+    boolean hasUsb = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,13 +93,17 @@ public class MainActivity extends Activity {
 
         setContentView(frame);
 
-        mUsbCommander = new UsbCommander(this);
+        if (hasUsb) {
+            mUsbCommander = new UsbCommander(this);
+        }
         brain = new Brain(this, mUsbCommander);
     }
 
     @Override
     protected void onDestroy() {
-        mUsbCommander.unregisterReceiver();
+        if (mUsbCommander != null) {
+            mUsbCommander.unregisterReceiver();
+        }
         super.onDestroy();
     }
 
@@ -169,7 +175,9 @@ public class MainActivity extends Activity {
         glview.onPause();
 
         // USBアクセサリ関連
-        mUsbCommander.closeAccessory();
+        if (mUsbCommander != null) {
+            mUsbCommander.closeAccessory();
+        }
     }
 
     @Override
@@ -195,8 +203,10 @@ public class MainActivity extends Activity {
 
         mPreview.addCallbackStack(cbstack);
         mPreview.onResume();
-        
-        mUsbCommander.reopen();
+
+        if (mUsbCommander != null) {
+            mUsbCommander.reopen();
+        }
     }
 
     class Processor implements NativeProcessor.PoolCallback {

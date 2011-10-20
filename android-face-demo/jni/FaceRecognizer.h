@@ -23,6 +23,7 @@ public:
 	FaceRecognizer();
   ~FaceRecognizer();
 	int recognize(int idx, image_pool* pool);
+  void learn();
 private:
   HaarFaceDetector* haarFaceDetector;
   ObjectMatcher* objectMatcher;

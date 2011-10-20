@@ -24,6 +24,7 @@ FaceRecognizer::FaceRecognizer () {
   
   //eigen face recognizer
   eigenFace = new EigenFace("/data/data/com.polysfactory.facerecognition/files/facedata.xml");
+  eigenFace->loadTrainingData();
   
   cvInitFont(&font, CV_FONT_HERSHEY_DUPLEX, 1.0, 1.0, 0, 3, 8);
 }
@@ -34,6 +35,10 @@ FaceRecognizer::FaceRecognizer () {
 FaceRecognizer::~FaceRecognizer () {
   delete(haarFaceDetector);
   delete(objectMatcher);
+}
+
+void FaceRecognizer::learn(){
+  eigenFace->loadTrainingData();
 }
 
 /**
