@@ -12,16 +12,7 @@ FaceRecognizer::FaceRecognizer () {
   haarFaceDetector = new HaarFaceDetector(
     "/data/data/com.polysfactory.facerecognition/files/haarcascade_frontalface_default.xml",
     "/data/data/com.polysfactory.facerecognition/files/haarcascade_eye_tree_eyeglasses.xml",
-    "/data/data/com.polysfactory.facerecognition/files/haarcascade_mcs_mouth.xml");
-  objectMatcher = new ObjectMatcher();
-  // load feature vector
-  objectMatcher->loadDescription("/data/data/com.polysfactory.facerecognition/files/takahiro.txt");
-  objectMatcher->loadDescription("/data/data/com.polysfactory.facerecognition/files/akita.txt");
-  objectMatcher->loadDescription("/data/data/com.polysfactory.facerecognition/files/kei.txt");
-  objectMatcher->loadDescription("/data/data/com.polysfactory.facerecognition/files/koga.txt");
-  objectMatcher->loadDescription("/data/data/com.polysfactory.facerecognition/files/sato.txt");
-  objectMatcher->loadDescription("/data/data/com.polysfactory.facerecognition/files/pan2.txt");
-  
+    "/data/data/com.polysfactory.facerecognition/files/haarcascade_mcs_mouth.xml");  
   //eigen face recognizer
   eigenFace = new EigenFace("/data/data/com.polysfactory.facerecognition/files/facedata.xml");
   eigenFace->loadTrainingData();
@@ -34,7 +25,6 @@ FaceRecognizer::FaceRecognizer () {
  */
 FaceRecognizer::~FaceRecognizer () {
   delete(haarFaceDetector);
-  delete(objectMatcher);
 }
 
 void FaceRecognizer::learn(){
