@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import org.apache.http.client.utils.CloneUtils;
-
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
@@ -23,7 +21,6 @@ import android.util.Log;
 
 import com.opencv.jni.image_pool;
 import com.polysfactory.facerecognition.behavior.BehaviorManager;
-import com.polysfactory.facerecognition.behavior.IBehavior;
 import com.polysfactory.facerecognition.jni.FaceRecognizer;
 import com.polysfactory.robotaudio.jni.RobotAudio;
 
@@ -82,7 +79,7 @@ public class Brain extends Thread {
     MediaPlayer mp = null;
 
     RobotAudio robotAudio = new RobotAudio();
-    
+
     volatile boolean stopThread = false;
 
     /**
@@ -219,7 +216,7 @@ public class Brain extends Thread {
                     mUsbCommander.forward();
                 }
                 break;
-            } else if (text.contains("停止") || text.contains("止まれ") || text.contains("止まって") || text.contains("ストップ")) {
+            } else if (text.contains("停止") || text.contains("止まれ") || text.contains("とまれ") || text.contains("止まって") || text.contains("ストップ")) {
                 stopThread = true;
                 stopMusic();
                 if (mUsbCommander != null) {
@@ -233,20 +230,28 @@ public class Brain extends Thread {
                     mUsbCommander.backward();
                 }
                 break;
-            } else if (text.contains("旋回") || text.contains("回れ") || text.contains("回って")) {
+            } else if (text.contains("旋回") || text.contains("回れ") || text.contains("回って") || text.contains("まわれ")) {
                 stopThread = true;
                 stopMusic();
                 if (mUsbCommander != null) {
                     mUsbCommander.spinTurnLeft();
                 }
                 break;
-            } else if (text.contains("こんにちわ")) {
+            } else if (text.contains("こんにちわ") || text.contains("こんにちは")) {
                 stopThread = true;
-                speakByRobotVoie("こんにちわ");
+                speakByRobotVoie("こんにちは");
                 break;
-            } else if (text.contains("踊れ") || text.contains("踊って")) {
+            } else if (text.contains("踊れ") || text.contains("踊って") || text.contains("おどれ")) {
                 playMusic(ContentUris.withAppendedId(Media.EXTERNAL_CONTENT_URI, 29));
-                this.start();
+                if (!this.isAlive()) {
+                    this.start();
+                }
+            } else if (text.contains("ありがとう")) {
+                stopThread = true;
+                speakByRobotVoie("ありがとうございました！");
+            } else if (text.contains("元気")) {
+                stopThread = true;
+                speakByRobotVoie("元気です！");
             }
         }
     }
@@ -355,7 +360,9 @@ public class Brain extends Thread {
                     }
                 } else {
                     if (mUsbCommander != null) {
-                        mUsbCommander.rotateLeftHand(0);
+                        // 左手は数値増加で腕をあげる
+                        // 右手は数値減少で腕をあげる
+                        mUsbCommander.rotateLeftHand(60);
                     }
                 }
                 // tts.speak("こんにちは" + names[objId] + "さん！", TextToSpeech.QUEUE_FLUSH, null);
@@ -372,7 +379,7 @@ public class Brain extends Thread {
                     }
                 } else {
                     if (mUsbCommander != null) {
-                        mUsbCommander.rotateLeftHand(43);
+                        mUsbCommander.rotateLeftHand(10);
                     }
                 }
                 turn++;
@@ -408,8 +415,7 @@ public class Brain extends Thread {
              * int interval = 16; // double d = Math.random() * 2; // interval = (int) (((double) interval) * d); int commandId = (int) (Math.random() * 3); switch (commandId) { case 0: degreeAdd(0,
              * interval); break; case 1: degreeAdd(1, interval); break; case 2: degreeAdd(2, interval); break; // case 3: // nextEye(); // break; // } }
              */
-            IBehavior behavior = mBehaviorManager.getBehavior();
-            behavior.action();
+            mBehaviorManager.next();
             mySleep(450);
         }
     }

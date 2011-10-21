@@ -22,6 +22,7 @@ public class BehaviorManager {
         behaviorVector.add(new Greeting(usbCommander));
         behaviorVector.add(new UroUro(usbCommander));
         behaviorVector.add(new KyoroKyoro(usbCommander));
+        behaviorVector.add(new UroUro2(usbCommander));
     }
 
     private IBehavior getNewBehavior() {
@@ -29,13 +30,13 @@ public class BehaviorManager {
         return behaviorVector.get(n);
     }
 
-    public IBehavior getBehavior() {
+    public void next() {
         if (currentBehavior == null) {
             currentBehavior = getNewBehavior();
         } else if (currentBehavior.isFinished()) {
             currentBehavior.reset();
             currentBehavior = getNewBehavior();
         }
-        return currentBehavior;
+        currentBehavior.action();
     }
 }
