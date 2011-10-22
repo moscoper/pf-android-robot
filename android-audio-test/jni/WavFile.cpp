@@ -53,6 +53,7 @@
 #include <limits.h>
 
 #include "WavFile.h"
+#include "../log.h"
 
 using namespace std;
 
@@ -230,6 +231,7 @@ int WavInFile::checkCharTags() const
 
 int WavInFile::read(char *buffer, int maxElems)
 {
+  LOGD("read for char");
     int numBytes;
     uint afterDataRead;
 
@@ -259,6 +261,7 @@ int WavInFile::read(char *buffer, int maxElems)
 
 int WavInFile::read(short *buffer, int maxElems)
 {
+    LOGD("sample size=%d", header.format.bits_per_sample);
     unsigned int afterDataRead;
     int numBytes;
     int numElems;
@@ -332,6 +335,38 @@ int WavInFile::read(float *buffer, int maxElems)
     delete[] temp;
 
     return num;
+}
+
+
+#define BYTESTOINT(b1,b2) (b2 << 8) + b1
+
+void WavInFile::normalize()
+{
+  fseek(fptr, 0, SEEK_SET);
+  char buffer[2];
+  int peak=-1;
+  if (header.format.bits_per_sample == 16) {
+    while(1) {
+      int numBytes = (int)fread(buffer, 1, 2, fptr);
+      if (numBytes != 2) {
+        break;
+      }
+      // 16bit samples, swap byte order if necessary
+      int i = BYTESTOINT(buffer[0], buffer[1]);
+      if (i>peak) {
+        peak=i;
+      }
+    }
+  }
+  fseek(fptr, 0, SEEK_SET);
+  LOGD("max=%d", peak);
+  
+  // ピーク値から乗算値を求める
+  float mul = (32767.0f / (float)peak);
+
+  
+  fseek(fptr, 0, SEEK_SET);
+
 }
 
 
@@ -630,8 +665,6 @@ void WavOutFile::finishHeader()
 
     writeHeader();
 }
-
-
 
 void WavOutFile::writeHeader()
 {

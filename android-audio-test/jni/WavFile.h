@@ -187,6 +187,8 @@ public:
     ///
     /// \return Nonzero if end-of-file reached.
     int eof() const;
+  
+    void normalize();
 };
 
 
@@ -245,6 +247,7 @@ public:
     void write(const float *buffer,     ///< Pointer to sample data buffer.
                int numElems             ///< How many array items are to be written to file.
                );
+  
 };
 
 #endif

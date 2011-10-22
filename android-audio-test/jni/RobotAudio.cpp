@@ -1,20 +1,25 @@
 #include "RobotAudio.h"
 #include "log.h"
 
+RobotAudio::RobotAudio(char* inFile, char* outFile) {
+  strcpy(mInFile, inFile);
+  strcpy(mOutFile, outFile);
+}
+
 void RobotAudio::openFiles(WavInFile **inFile, WavOutFile **outFile)
 {
   LOGD("openFiles");
   int bits, samplerate, channels;
 
   // open input file...
-  *inFile = new WavInFile("/sdcard/poly.wav");
+  *inFile = new WavInFile(mInFile);
 
   // ... open output file with same sound parameters
   bits = (int)(*inFile)->getNumBits();
   samplerate = (int)(*inFile)->getSampleRate();
   channels = (int)(*inFile)->getNumChannels();
 
-  *outFile = new WavOutFile("/sdcard/robot.wav", samplerate, bits, channels);
+  *outFile = new WavOutFile(mOutFile, samplerate, bits, channels);
 }
 
 
@@ -85,7 +90,7 @@ void RobotAudio::process(SoundTouch *pSoundTouch, WavInFile *inFile, WavOutFile 
       
     //if (counter % 400 == 0) {
       // random select pitch
-      float pitch = (float)(rand()%12)+8.0F;
+      float pitch = (float)(rand()%5)+8.0F;
       pSoundTouch->setPitchSemiTones(pitch);
     //}
     
@@ -134,6 +139,8 @@ int RobotAudio::pitchShift(float pitch)
       // Setup the 'SoundTouch' object for processing the sound
       setup(&soundTouch, inFile, pitch);
 
+    inFile->normalize();
+    
       // Process the sound
       process(&soundTouch, inFile, outFile);
 
@@ -151,4 +158,10 @@ int RobotAudio::pitchShift(float pitch)
   }
   LOGD("execute end");
   return 0;
+}
+
+int main () {
+  RobotAudio* robotAudio = new RobotAudio("/Users/takahiro/Desktop/poly.wav", "/Users/takahiro/Desktop/poly2.wav");
+  robotAudio->pitchShift(0);
+  return 1;
 }
