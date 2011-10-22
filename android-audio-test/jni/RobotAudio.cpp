@@ -139,7 +139,7 @@ int RobotAudio::pitchShift(float pitch)
       // Setup the 'SoundTouch' object for processing the sound
       setup(&soundTouch, inFile, pitch);
 
-    inFile->normalize();
+    //inFile->normalize();
     
       // Process the sound
       process(&soundTouch, inFile, outFile);
