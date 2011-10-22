@@ -6,8 +6,8 @@ import com.polysfactory.facerecognition.App;
 
 /**
  * ウロウロする振る舞い<br>
- * @author $Author: horikawa.takahiro@gmail.com $
- * @version $Revision: 49 $
+ * @author $Author$
+ * @version $Revision$
  */
 public class KyoroKyoro extends Behavior {
 
