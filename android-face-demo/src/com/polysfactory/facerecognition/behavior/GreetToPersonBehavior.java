@@ -4,12 +4,8 @@ import android.util.Log;
 
 import com.polysfactory.facerecognition.App;
 
-/**
- * あいさつの振る舞い<br>
- * @author $Author$
- * @version $Revision$
- */
-public class Greeting extends Behavior {
+public class GreetToPersonBehavior extends Behavior {
+    String name;
 
     @Override
     public void execute() {
@@ -17,6 +13,7 @@ public class Greeting extends Behavior {
         mUsbCommander.lightLed(0, 0, 3);
         sleep(100);
         mUsbCommander.rotateRightHand(50);
+        mAudioCommander.speakByRobotVoie("こんにちわ、" + name + "さん！");
         sleep(300);
         mUsbCommander.lightLed(0, 3, 0);
         sleep(100);
@@ -24,5 +21,4 @@ public class Greeting extends Behavior {
         sleep(300);
         mUsbCommander.lightLed(0, 0, 0);
     }
-
 }

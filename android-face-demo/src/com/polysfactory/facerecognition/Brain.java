@@ -1,55 +1,29 @@
 package com.polysfactory.facerecognition;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Locale;
 
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore.Audio.Media;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
-import android.speech.tts.TextToSpeech;
-import android.speech.tts.TextToSpeech.OnInitListener;
 import android.util.Log;
 
 import com.opencv.jni.image_pool;
 import com.polysfactory.facerecognition.behavior.BehaviorManager;
 import com.polysfactory.facerecognition.jni.FaceRecognizer;
-import com.polysfactory.robotaudio.jni.RobotAudio;
 
 /**
  * ロボットの自律的な行動を制御するためのクラス<br>
  * @author $Author$
  * @version $Revision$
  */
-public class Brain extends Thread {
-    /** 左腕の角度 */
-    int leftHandDegere = 0;
-
-    /** 前回までの左腕の回転方向 */
-    int leftRotateWay = 0;
-
-    /** 右腕の角度 */
-    int rightHandDegree = 0;
-
-    /** 前回までの右腕の回転方向 */
-    int rightRotateWay = 0;
-
-    /** 首の角度 */
-    int NeckDegree = 0;
-
-    /** 前回までの首の回転方向 */
-    int neckRotateWay = 0;
-
-    /** 目の色 */
-    int eyeColor = 0;
+public class Brain {
 
     /** コンテキスト */
     Context mContext;
@@ -58,9 +32,6 @@ public class Brain extends Thread {
 
     /** 顔認識器 */
     FaceRecognizer mFaceRecognizer;
-
-    /** 音声 */
-    TextToSpeech tts;
 
     /** 直前に検出した時間 */
     long prevTime = 0;
@@ -76,11 +47,9 @@ public class Brain extends Thread {
 
     Intent intent = new Intent();
 
-    MediaPlayer mp = null;
-
-    RobotAudio robotAudio = new RobotAudio("/sdcard/poly.wav", "/sdcard/robot.wav");
-
     volatile boolean stopThread = false;
+
+    private AudioCommander mAudioCommander;
 
     /**
      * コンストラクタ<br>
@@ -89,30 +58,17 @@ public class Brain extends Thread {
     public Brain(Context context, UsbCommander usbCommander) {
         mContext = context;
         mUsbCommander = usbCommander;
+        mAudioCommander = new AudioCommander(context);
         mFaceRecognizer = new FaceRecognizer();
-        mBehaviorManager = new BehaviorManager(usbCommander);
-        // setup TextToSpeech object
-        tts = new TextToSpeech(context, new OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if (status == TextToSpeech.SUCCESS) {
-                    // ロケールの指定
-                    // Locale locale = Locale.ENGLISH;
-                    Locale locale = Locale.JAPANESE;
-                    if (tts.isLanguageAvailable(locale) >= TextToSpeech.LANG_AVAILABLE) {
-                        tts.setLanguage(locale);
-                        tts.setPitch(0.5F);
-                        tts.setSpeechRate(0.7F);
-                    } else {
-                        Log.e(App.TAG, "Error SetLocale");
-                    }
-                }
-            }
-        });
+        mBehaviorManager = new BehaviorManager(usbCommander, mAudioCommander);
         initSpeechRecognizer();
         // this.start();
+        activeHandler.sendEmptyMessageDelayed(100, 10000);
     }
 
+    /**
+     * 音声認識オブジェクトを初期化する<br>
+     */
     void initSpeechRecognizer() {
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         sr = SpeechRecognizer.createSpeechRecognizer(mContext);
@@ -211,130 +167,49 @@ public class Brain extends Thread {
             Log.d(App.TAG, "actionOnListening:" + text);
             if (text.contains("前進") || text.contains("進め") || text.contains("進んで") || text.contains("ゴー")) {
                 stopThread = true;
-                stopMusic();
+                mAudioCommander.stopMusic();
                 if (mUsbCommander != null) {
                     mUsbCommander.forward();
                 }
                 break;
             } else if (text.contains("停止") || text.contains("止まれ") || text.contains("とまれ") || text.contains("止まって") || text.contains("ストップ")) {
                 stopThread = true;
-                stopMusic();
+                mAudioCommander.stopMusic();
                 if (mUsbCommander != null) {
                     mUsbCommander.stop();
                 }
                 break;
             } else if (text.contains("後退") || text.contains("戻れ") || text.contains("戻って") || text.contains("バック")) {
                 stopThread = true;
-                stopMusic();
+                mAudioCommander.stopMusic();
                 if (mUsbCommander != null) {
                     mUsbCommander.backward();
                 }
                 break;
             } else if (text.contains("旋回") || text.contains("回れ") || text.contains("回って") || text.contains("まわれ")) {
                 stopThread = true;
-                stopMusic();
+                mAudioCommander.stopMusic();
                 if (mUsbCommander != null) {
                     mUsbCommander.spinTurnLeft();
+                    // mUsbCommander.pivotTurnLeft();
                 }
                 break;
             } else if (text.contains("こんにちわ") || text.contains("こんにちは")) {
                 stopThread = true;
-                speakByRobotVoie("こんにちは");
+                mAudioCommander.speakByRobotVoie("こんにちは");
                 break;
             } else if (text.contains("踊れ") || text.contains("踊って") || text.contains("おどれ")) {
-                playMusic(ContentUris.withAppendedId(Media.EXTERNAL_CONTENT_URI, 29));
-                if (!this.isAlive()) {
-                    this.start();
-                }
+                mAudioCommander.playMusic(ContentUris.withAppendedId(Media.EXTERNAL_CONTENT_URI, 29));
+                stopThread = true;
+                new OdoruThread().start();
             } else if (text.contains("ありがとう")) {
                 stopThread = true;
-                speakByRobotVoie("ありがとうございました！");
+                mAudioCommander.speakByRobotVoie("ありがとうございました！");
             } else if (text.contains("元気")) {
                 stopThread = true;
-                speakByRobotVoie("元気です！");
+                mAudioCommander.speakByRobotVoie("元気です！");
             }
         }
-    }
-
-    void nextEye() {
-        // if (eyeColor == 0 || eyeColor == 3) {
-        // eyeColor = 3 << 4;
-        // } else if (eyeColor == (3 << 4)) {
-        // eyeColor = 3 << 2;
-        // } else if (eyeColor == (3 << 2)) {
-        // eyeColor = 3;
-        // }
-        if (mUsbCommander != null) {
-            mUsbCommander.lightLed(eyeColor);
-        }
-        eyeColor++;
-        if (eyeColor >= 64) {
-            eyeColor = 0;
-        }
-    }
-
-    void degreeAdd(int objectId, int addedDegree) {
-        int originalDegree;
-        int rotateWay;
-        switch (objectId) {
-        case 0:
-            originalDegree = leftHandDegere;
-            rotateWay = leftRotateWay;
-            break;
-        case 1:
-            originalDegree = rightHandDegree;
-            rotateWay = rightRotateWay;
-            break;
-        case 2:
-            originalDegree = NeckDegree;
-            rotateWay = neckRotateWay;
-            break;
-        default:
-            throw new RuntimeException("unknown object Id for rotate");
-        }
-        int lowThre = 0;
-        int highThre = 63;
-        if (objectId == 1) {
-            lowThre = 20;
-        } else if (objectId == 0) {
-            highThre = 43;
-        }
-
-        if (rotateWay == 0) {
-            if (originalDegree + addedDegree > highThre) {
-                originalDegree = highThre;
-                rotateWay = 1;
-            } else {
-                originalDegree += addedDegree;
-            }
-        } else if (rotateWay == 1) {
-            if (originalDegree - addedDegree < lowThre) {
-                originalDegree = lowThre;
-                rotateWay = 0;
-            } else {
-                originalDegree -= addedDegree;
-            }
-        }
-        if (mUsbCommander != null) {
-            mUsbCommander.rotateServo(objectId, originalDegree);
-        }
-        switch (objectId) {
-        case 0:
-            leftHandDegere = originalDegree;
-            leftRotateWay = rotateWay;
-            break;
-        case 1:
-            rightHandDegree = originalDegree;
-            rightRotateWay = rotateWay;
-            break;
-        case 2:
-            NeckDegree = originalDegree;
-            neckRotateWay = rotateWay;
-            break;
-        default:
-            throw new RuntimeException("unknown object Id for rotate");
-        }
-
     }
 
     int turn = 0;
@@ -352,71 +227,40 @@ public class Brain extends Thread {
         String[] names = {"不明", "秋田", "ホソミ", "イガリ", "伊藤", "中澤", "古賀", "ナミカワ", "ハン", "佐藤", "ポリー", "山田", "ショウコ" };
         if (objId >= 0) {
             Log.d(App.TAG, "objId=" + objId + ",prevObjId=" + prevObjId + ",timediff=" + (timestamp - prevTime));
-            if (timestamp - prevTime < 2000 && prevObjId == objId && !tts.isSpeaking()) {
-                // // for test
-                if (turn % 2 == 0) {
-                    if (mUsbCommander != null) {
-                        mUsbCommander.rotateNeck(63);
-                    }
-                } else {
-                    if (mUsbCommander != null) {
-                        // 左手は数値増加で腕をあげる
-                        // 右手は数値減少で腕をあげる
-                        mUsbCommander.rotateLeftHand(60);
-                    }
-                }
-                // tts.speak("こんにちは" + names[objId] + "さん！", TextToSpeech.QUEUE_FLUSH, null);
-                speakByRobotVoie("こんにちは" + names[objId] + "さん！");
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    // TODO 自動生成された catch ブロック
-                    e.printStackTrace();
-                }
-                if (turn % 2 == 0) {
-                    if (mUsbCommander != null) {
-                        mUsbCommander.rotateNeck(32);
-                    }
-                } else {
-                    if (mUsbCommander != null) {
-                        mUsbCommander.rotateLeftHand(10);
-                    }
-                }
-                turn++;
-                // mUsbCommander.rotateRightHand(60);
-                // try {
-                // Thread.sleep(1000);
-                // } catch (InterruptedException e) {
-                // // TODO 自動生成された catch ブロック
-                // e.printStackTrace();
-                // }
-                // mUsbCommander.rotateNeck(60);
-                // try {
-                // Thread.sleep(1000);
-                // } catch (InterruptedException e) {
-                // // TODO 自動生成された catch ブロック
-                // e.printStackTrace();
-                // }
-                // mUsbCommander.lightLed(3, 0, 0);
+            if (timestamp - prevTime < 2000 && prevObjId == objId) {
+                mBehaviorManager.greetToPerson(names[objId]);
             }
         }
         prevObjId = objId;
         prevTime = timestamp;
     }
 
-    @Override
-    public void run() {
-        stopThread = false;
-        while (true) {
-            if (stopThread) {
-                break;
-            }
-            /*
-             * int interval = 16; // double d = Math.random() * 2; // interval = (int) (((double) interval) * d); int commandId = (int) (Math.random() * 3); switch (commandId) { case 0: degreeAdd(0,
-             * interval); break; case 1: degreeAdd(1, interval); break; case 2: degreeAdd(2, interval); break; // case 3: // nextEye(); // break; // } }
-             */
+    ActiveHandler activeHandler = new ActiveHandler();
+
+    public class ActiveHandler extends Handler {
+
+        @Override
+        public void handleMessage(Message msg) {
             mBehaviorManager.next();
-            mySleep(450);
+            activeHandler.sendEmptyMessageDelayed(100, 10000);
+        }
+
+    }
+
+    public class OdoruThread extends Thread {
+        public void run() {
+            stopThread = false;
+            while (true) {
+                if (stopThread) {
+                    break;
+                }
+                /*
+                 * int interval = 16; // double d = Math.random() * 2; // interval = (int) (((double) interval) * d); int commandId = (int) (Math.random() * 3); switch (commandId) { case 0:
+                 * degreeAdd(0, interval); break; case 1: degreeAdd(1, interval); break; case 2: degreeAdd(2, interval); break; // case 3: // nextEye(); // break; // } }
+                 */
+                mBehaviorManager.next();
+                mySleep(100);
+            }
         }
     }
 
@@ -428,62 +272,8 @@ public class Brain extends Thread {
         }
     }
 
-    public void speakByRobotVoie(String text) {
-        tts.synthesizeToFile(text, null, "/sdcard/poly.wav");
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e1) {
-            // TODO 自動生成された catch ブロック
-            e1.printStackTrace();
-        }
-        robotAudio.pitchShift(0);
-        if (mp != null) {
-            mp.release();
-            mp = null;
-        }
-        mp = new MediaPlayer();
-        try {
-            mp.setDataSource("/sdcard/robot.wav");
-            mp.prepare();
-        } catch (IllegalArgumentException e) {
-            // TODO 自動生成された catch ブロック
-            e.printStackTrace();
-        } catch (IllegalStateException e) {
-            // TODO 自動生成された catch ブロック
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO 自動生成された catch ブロック
-            e.printStackTrace();
-        }
-        mp.start();
-    }
-
-    public void playMusic(Uri audioUri) {
-        if (mp != null) {
-            mp.release();
-            mp = null;
-        }
-        mp = new MediaPlayer();
-        try {
-            mp.setDataSource(mContext, audioUri);
-            mp.prepare();
-        } catch (IllegalArgumentException e) {
-            // TODO 自動生成された catch ブロック
-            e.printStackTrace();
-        } catch (IllegalStateException e) {
-            // TODO 自動生成された catch ブロック
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO 自動生成された catch ブロック
-            e.printStackTrace();
-        }
-        mp.start();
-    }
-
-    public void stopMusic() {
-        if (mp != null) {
-            mp.release();
-            mp = null;
-        }
+    public void reset() {
+        stopThread = true;
+        mAudioCommander.stopMusic();
     }
 }

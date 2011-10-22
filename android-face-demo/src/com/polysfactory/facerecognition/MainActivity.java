@@ -104,6 +104,7 @@ public class MainActivity extends Activity {
         if (mUsbCommander != null) {
             mUsbCommander.unregisterReceiver();
         }
+        brain.reset();
         super.onDestroy();
     }
 

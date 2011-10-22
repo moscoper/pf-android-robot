@@ -2,6 +2,10 @@ package com.polysfactory.facerecognition.behavior;
 
 import java.util.Vector;
 
+import android.util.Log;
+
+import com.polysfactory.facerecognition.App;
+import com.polysfactory.facerecognition.AudioCommander;
 import com.polysfactory.facerecognition.UsbCommander;
 
 /**
@@ -10,33 +14,53 @@ import com.polysfactory.facerecognition.UsbCommander;
  * @version $Revision$
  */
 public class BehaviorManager {
-    Vector<IBehavior> behaviorVector;
+    Vector<Behavior> behaviorVector;
 
     UsbCommander mUsbCommander;
 
-    IBehavior currentBehavior;
+    Behavior currentBehavior;
 
-    public BehaviorManager(UsbCommander usbCommander) {
+    GreetToPersonBehavior greetToPersonBehavior;
+
+    public BehaviorManager(UsbCommander usbCommander, AudioCommander audioCommander) {
         mUsbCommander = usbCommander;
-        behaviorVector = new Vector<IBehavior>();
-        behaviorVector.add(new Greeting(usbCommander));
-        behaviorVector.add(new UroUro(usbCommander));
-        behaviorVector.add(new KyoroKyoro(usbCommander));
-        behaviorVector.add(new UroUro2(usbCommander));
+        // ランダムに能動的に行う振る舞いはVectorに突っ込む
+        behaviorVector = new Vector<Behavior>();
+        behaviorVector.add(new Greeting());
+        behaviorVector.add(new UroUro());
+        behaviorVector.add(new KyoroKyoro());
+
+        // 外的要因によって受動的に行う振る舞いは個別のオブジェクトに持つ
+        greetToPersonBehavior = new GreetToPersonBehavior();
+        greetToPersonBehavior.mUsbCommander = usbCommander;
+        greetToPersonBehavior.mAudioCommander = audioCommander;
+
+        for (Behavior b : behaviorVector) {
+            b.mUsbCommander = usbCommander;
+            b.mAudioCommander = audioCommander;
+        }
     }
 
-    private IBehavior getNewBehavior() {
+    public void greetToPerson(String name) {
+        greetToPersonBehavior.name = name;
+        if (!greetToPersonBehavior.isRunning()) {
+            new Thread(greetToPersonBehavior).start();
+        } else {
+            Log.w(App.TAG, "thread is running");
+        }
+    }
+
+    private Behavior getNewBehavior() {
         int n = (int) (Math.random() * behaviorVector.size());
         return behaviorVector.get(n);
     }
 
     public void next() {
-        if (currentBehavior == null) {
-            currentBehavior = getNewBehavior();
-        } else if (currentBehavior.isFinished()) {
-            currentBehavior.reset();
-            currentBehavior = getNewBehavior();
+        currentBehavior = getNewBehavior();
+        if (!currentBehavior.isRunning()) {
+            new Thread(currentBehavior).start();
+        } else {
+            Log.w(App.TAG, "thread is running");
         }
-        currentBehavior.action();
     }
 }
