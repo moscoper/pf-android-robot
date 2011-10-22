@@ -35,12 +35,12 @@ public class RobotAudio {
     }
   }
 
-  public int pitchShift(float pitch) {
-    return NativeSoundTouchJNI.RobotAudio_pitchShift(swigCPtr, this, pitch);
+  public RobotAudio(String inFile, String outFie) {
+    this(NativeSoundTouchJNI.new_RobotAudio(inFile, outFie), true);
   }
 
-  public RobotAudio() {
-    this(NativeSoundTouchJNI.new_RobotAudio(), true);
+  public int pitchShift(float pitch) {
+    return NativeSoundTouchJNI.RobotAudio_pitchShift(swigCPtr, this, pitch);
   }
 
 }

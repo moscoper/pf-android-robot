@@ -78,7 +78,7 @@ public class Brain extends Thread {
 
     MediaPlayer mp = null;
 
-    RobotAudio robotAudio = new RobotAudio();
+    RobotAudio robotAudio = new RobotAudio("/sdcard/poly.wav", "/sdcard/robot.wav");
 
     volatile boolean stopThread = false;
 
