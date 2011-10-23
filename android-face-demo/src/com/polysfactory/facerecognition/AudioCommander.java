@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.util.Locale;
 
 import android.content.Context;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.net.Uri;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
@@ -29,6 +31,10 @@ public class AudioCommander {
 
     Context mContext;
 
+    SoundPool soundPool;
+
+    private int thinkingSoundId;
+
     public AudioCommander(Context context) {
         mContext = context;
         // setup TextToSpeech object
@@ -49,6 +55,17 @@ public class AudioCommander {
                 }
             }
         });
+        soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+        thinkingSoundId = soundPool.load(context, R.raw.thinking, 1);
+    }
+
+    /**
+     * ロボット思考中の音声をならす<br>
+     * @param loop ループ回数（-1の場合は無限にループ、0の場合はループしない）
+     * @param rate 再生速度（0.5〜2.0：0.5倍から2倍の速度まで設定できる）
+     */
+    public void ringThinkingSound(int loop, float rate) {
+        soundPool.play(thinkingSoundId, 1.0F, 1.0F, 1, loop, rate);
     }
 
     public void speakByRobotVoie(String text) {

@@ -26,9 +26,12 @@ public class BehaviorManager {
         mUsbCommander = usbCommander;
         // ランダムに能動的に行う振る舞いはVectorに突っ込む
         behaviorVector = new Vector<Behavior>();
-        behaviorVector.add(new Greeting());
-        behaviorVector.add(new UroUro());
-        behaviorVector.add(new KyoroKyoro());
+        // behaviorVector.add(new Greeting());
+        // behaviorVector.add(new UroUro());
+        // behaviorVector.add(new KyoroKyoro());
+        // behaviorVector.add(new Wondering());
+        behaviorVector.add(new Thinking());
+        behaviorVector.add(new Guchi());
 
         // 外的要因によって受動的に行う振る舞いは個別のオブジェクトに持つ
         greetToPersonBehavior = new GreetToPersonBehavior();
