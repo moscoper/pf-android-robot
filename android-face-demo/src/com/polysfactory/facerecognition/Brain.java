@@ -51,6 +51,8 @@ public class Brain {
 
     private AudioCommander mAudioCommander;
 
+    private static final int INTERVAL = 20000;
+
     /**
      * コンストラクタ<br>
      * @param usbCommander
@@ -63,7 +65,7 @@ public class Brain {
         mBehaviorManager = new BehaviorManager(usbCommander, mAudioCommander);
         initSpeechRecognizer();
         // this.start();
-        activeHandler.sendEmptyMessageDelayed(100, 10000);
+        activeHandler.sendEmptyMessageDelayed(100, INTERVAL);
     }
 
     /**
@@ -242,7 +244,7 @@ public class Brain {
         @Override
         public void handleMessage(Message msg) {
             mBehaviorManager.next();
-            activeHandler.sendEmptyMessageDelayed(100, 10000);
+            activeHandler.sendEmptyMessageDelayed(100, INTERVAL);
         }
 
     }
@@ -274,6 +276,7 @@ public class Brain {
 
     public void reset() {
         stopThread = true;
+        activeHandler.removeMessages(100);
         mAudioCommander.stopMusic();
     }
 }

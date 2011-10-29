@@ -1,21 +1,23 @@
 package com.polysfactory.facerecognition.behavior;
 
+import com.polysfactory.facerecognition.CommandUtils;
+
 public class Thinking extends Behavior {
 
     @Override
     public void execute() {
-        mAudioCommander.ringThinkingSound(0, 1.5F);
-        mUsbCommander.lightLed(0, 0, 3);
+        CommandUtils.randomLengthThinking(mAudioCommander);
+        CommandUtils.randomEye(mUsbCommander);
         sleep(100);
-        mUsbCommander.rotateNeck(10);
+        CommandUtils.randomHand(mUsbCommander);
         sleep(1000);
-        mUsbCommander.lightLed(0, 3, 0);
+        CommandUtils.randomEye(mUsbCommander);
         sleep(100);
-        mUsbCommander.rotateNeck(60);
+        CommandUtils.randomHand(mUsbCommander);
         sleep(1000);
-        mUsbCommander.lightLed(0, 2, 2);
+        CommandUtils.randomEye(mUsbCommander);
         sleep(100);
-        mUsbCommander.rotateNeck(32);
+        mUsbCommander.lightLed(0);
     }
 
 }

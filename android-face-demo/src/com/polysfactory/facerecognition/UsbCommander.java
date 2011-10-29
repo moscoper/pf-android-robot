@@ -222,19 +222,30 @@ public class UsbCommander extends BroadcastReceiver {
         }
     }
 
-    /**  */
+    /**
+     * 右に曲がる
+     */
     public void pivotTurnRight() {
         issueMotorCommand((byte) (MotorCommand.motor1Forward | MotorCommand.motor2Stop));
     }
 
+    /**
+     * 左に曲がる
+     */
     public void pivotTurnLeft() {
         issueMotorCommand((byte) (MotorCommand.motor2Forward | MotorCommand.motor1Stop));
     }
 
+    /**
+     * 右に超信地旋回
+     */
     public void spinTurnRight() {
         issueMotorCommand((byte) (MotorCommand.motor1Forward | MotorCommand.motor2Backward));
     }
 
+    /**
+     * 左に超信地旋回
+     */
     public void spinTurnLeft() {
         issueMotorCommand((byte) (MotorCommand.motor2Forward | MotorCommand.motor1Backward));
     }

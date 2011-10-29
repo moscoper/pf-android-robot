@@ -49,6 +49,7 @@ public class AudioCommander {
                         tts.setLanguage(locale);
                         tts.setPitch(0.5F);
                         tts.setSpeechRate(0.7F);
+                        // tts.setSpeechRate(1.0F);
                     } else {
                         Log.e(App.TAG, "Error SetLocale");
                     }
@@ -56,7 +57,8 @@ public class AudioCommander {
             }
         });
         soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
-        thinkingSoundId = soundPool.load(context, R.raw.thinking, 1);
+        // thinkingSoundId = soundPool.load(context, R.raw.thinking, 1);
+        thinkingSoundId = soundPool.load(context, R.raw.thinking2, 1);
     }
 
     /**
@@ -65,9 +67,14 @@ public class AudioCommander {
      * @param rate 再生速度（0.5〜2.0：0.5倍から2倍の速度まで設定できる）
      */
     public void ringThinkingSound(int loop, float rate) {
-        soundPool.play(thinkingSoundId, 1.0F, 1.0F, 1, loop, rate);
+        Log.d(App.TAG, "ring thinking sound:" + loop);
+        soundPool.play(thinkingSoundId, 0.5F, 0.5F, 1, loop, rate);
     }
 
+    /**
+     * ロボット声で喋る<br>
+     * @param text 喋らせる内容
+     */
     public void speakByRobotVoie(String text) {
         tts.synthesizeToFile(text, null, "/sdcard/poly.wav");
         try {
@@ -76,7 +83,7 @@ public class AudioCommander {
             // TODO 自動生成された catch ブロック
             e1.printStackTrace();
         }
-        robotAudio.pitchShift(0);
+        robotAudio.pitchShift(10);
         if (mp != null) {
             mp.release();
             mp = null;

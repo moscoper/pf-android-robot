@@ -1,5 +1,7 @@
 package com.polysfactory.facerecognition.behavior;
 
+import com.polysfactory.facerecognition.CommandUtils;
+
 /**
  * 愚痴<br>
  * @author $Author: horikawa.takahiro@gmail.com $
@@ -7,12 +9,29 @@ package com.polysfactory.facerecognition.behavior;
  */
 public class Guchi extends Behavior {
 
+    String sentenses[] = new String[] {
+            "あー、疲れたなー",
+            "お腹すいたー",
+            "眠たいよー",
+            // "早く、アイスクリームサンドイッチに、なりたいなー",
+            "早くアイフォンファイブ、でないかなー",
+            "今日も良く頑張ったわ、オレ",
+            "アップデートしてくれー",
+            // "なんかうまいもん、食べたい",
+            // ""
+    };
+
     @Override
     public void execute() {
         // mAudioCommander.speakByRobotVoie("ハハハッ！！血迷ったか？");
         // mAudioCommander.speakByRobotVoie("俺を倒せば世界は救われるんだぞ");どうした？手も足もでんか？そうかそうか、まあ人を一人殺す事になるのだからなあ！！ハハハハハハハハーーーーッ！！！！！！");
-        mUsbCommander.lightLed(3, 0, 0);
-        mAudioCommander.speakByRobotVoie("ザクとは違うのだよ、ザクとは！");
+        CommandUtils.randomEye(mUsbCommander);
+        sleep(100);
+        int n = (int) (Math.random() * sentenses.length);
+        CommandUtils.randomHand(mUsbCommander);
+        mAudioCommander.speakByRobotVoie(sentenses[n]);
+        sleep(1000);
+        mUsbCommander.lightLed(0, 0, 0);
     }
 
 }
