@@ -12,7 +12,7 @@
 
 class FaceCrop {
 public:
-  FaceCrop();
+  FaceCrop(char* basedir);
   ~FaceCrop();
   bool crop (char* inFile);
 private:

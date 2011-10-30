@@ -36,8 +36,8 @@ public class FaceCrop {
     }
   }
 
-  public FaceCrop() {
-    this(NativeFaceCropJNI.new_FaceCrop(), true);
+  public FaceCrop(String basedir) {
+    this(NativeFaceCropJNI.new_FaceCrop(basedir), true);
   }
 
   public boolean crop(String inFile) {

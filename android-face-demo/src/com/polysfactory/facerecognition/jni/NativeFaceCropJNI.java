@@ -30,7 +30,7 @@ public class NativeFaceCropJNI {
 	}
 
 
-  public final static native long new_FaceCrop();
+  public final static native long new_FaceCrop(String jarg1);
   public final static native void delete_FaceCrop(long jarg1);
   public final static native boolean FaceCrop_crop(long jarg1, FaceCrop jarg1_, String jarg2);
 }

@@ -7,11 +7,14 @@
 /**
  * コンストラクタ
  */
-FaceCrop::FaceCrop () {
-  haarFaceDetector = new HaarFaceDetector(
-    "/data/data/com.polysfactory.facerecognition/files/haarcascade_frontalface_default.xml",
-    "/data/data/com.polysfactory.facerecognition/files/haarcascade_eye_tree_eyeglasses.xml",
-    "/data/data/com.polysfactory.facerecognition/files/haarcascade_mcs_mouth.xml");  
+FaceCrop::FaceCrop (char* basedir) {
+  char face[256];
+  char eye[256];
+  char mouth[256];
+  sprintf(face, "%s/haarcascade_frontalface_default.xml", basedir);
+  sprintf(eye, "%s/haarcascade_eye_tree_eyeglasses.xml", basedir);
+  sprintf(mouth, "%s/haarcascade_mcs_mouth.xml", basedir);
+  haarFaceDetector = new HaarFaceDetector(face, eye, mouth);  
 }
 
 /**

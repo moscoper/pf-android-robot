@@ -36,6 +36,7 @@ FaceRecognizer::~FaceRecognizer () {
 void FaceRecognizer::learn(char* trainFileName){
   eigenFace->learn(trainFileName);
   eigenFace->loadTrainingData();
+  LOGD("learn end");
 }
 
 /**
@@ -51,6 +52,7 @@ int FaceRecognizer::recognize(int input_idx, image_pool* pool) {
   CvSize size = cvGetSize(&greyImage);
   CvSize rotatedSize = cvSize(size.height, size.width);
   IplImage* rotatedImage = cvCreateImage(rotatedSize, IPL_DEPTH_8U, 1);
+  // 90度回転
   cvTranspose(&greyImage, rotatedImage);
 
   if (&greyImage == NULL) {
