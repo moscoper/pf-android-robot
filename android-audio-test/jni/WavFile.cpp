@@ -231,7 +231,7 @@ int WavInFile::checkCharTags() const
 
 int WavInFile::read(char *buffer, int maxElems)
 {
-  LOGD("read for char");
+  //LOGD("read for char");
     int numBytes;
     uint afterDataRead;
 
@@ -261,7 +261,7 @@ int WavInFile::read(char *buffer, int maxElems)
 
 int WavInFile::read(short *buffer, int maxElems)
 {
-    LOGD("sample size=%d", header.format.bits_per_sample);
+    //LOGD("sample size=%d", header.format.bits_per_sample);
     unsigned int afterDataRead;
     int numBytes;
     int numElems;
@@ -359,7 +359,7 @@ void WavInFile::normalize()
     }
   }
   fseek(fptr, 0, SEEK_SET);
-  LOGD("max=%d", peak);
+  //LOGD("max=%d", peak);
   
   // ピーク値から乗算値を求める
   float mul = (32767.0f / (float)peak);

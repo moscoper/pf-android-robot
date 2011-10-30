@@ -61,7 +61,7 @@ void RobotAudio::setup(SoundTouch *pSoundTouch, const WavInFile *inFile, float p
 // Processes the sound
 void RobotAudio::process(SoundTouch *pSoundTouch, WavInFile *inFile, WavOutFile *outFile)
 {
-  LOGD("process");
+  //LOGD("process");
   int nSamples;
   int nChannels;
   int buffSizeSamples;
@@ -83,15 +83,16 @@ void RobotAudio::process(SoundTouch *pSoundTouch, WavInFile *inFile, WavOutFile 
     // Read a chunk of samples from the input file
     num = inFile->read(sampleBuffer, BUFF_SIZE);
     nSamples = num / (int)inFile->getNumChannels();
-    LOGD("%d bytes and %d samples read", num, nSamples);
+    //LOGD("%d bytes and %d samples read", num, nSamples);
 
     // Feed the samples into SoundTouch processor
     pSoundTouch->putSamples(sampleBuffer, nSamples);
       
     //if (counter % 400 == 0) {
       // random select pitch
-      float pitch = (float)(rand()%5)+8.0F;
-      pSoundTouch->setPitchSemiTones(pitch);
+      //float pitch = (float)(rand()%5)+8.0F;
+      //float pitch = (float)(rand()%5)+12.0F;
+      //pSoundTouch->setPitchSemiTones(pitch);
     //}
     
     // Read ready samples from SoundTouch processor & write them output file.
@@ -109,10 +110,10 @@ void RobotAudio::process(SoundTouch *pSoundTouch, WavInFile *inFile, WavOutFile 
         outFile->write(sampleBuffer, nSamples * nChannels);
         innerCounter++;
     } while (nSamples != 0);
-    LOGD("total inner count=%d", innerCounter);
+    //LOGD("total inner count=%d", innerCounter);
     counter++;
   }
-  LOGD("total sampling count=%d", counter);
+  //LOGD("total sampling count=%d", counter);
 
   // Now the input file is processed, yet 'flush' few last samples that are
   // hiding in the SoundTouch's internal processing pipeline.
