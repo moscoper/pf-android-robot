@@ -12,13 +12,15 @@ public class GreetToPersonBehavior extends Behavior {
         Log.d(App.TAG, "Greeting::action");
         mUsbCommander.lightLed(0, 0, 3);
         sleep(100);
-        mUsbCommander.rotateRightHand(50);
+        for (int i = 0; i < 3; i++) {
+            mUsbCommander.rotateNeck(0);
+            sleep(300);
+            mUsbCommander.rotateNeck(63);
+            sleep(300);
+        }
+        mUsbCommander.rotateNeck(32);
         mAudioCommander.speakByRobotVoie("こんにちわ、" + name + "さん！");
-        sleep(300);
-        mUsbCommander.lightLed(0, 3, 0);
-        sleep(100);
-        mUsbCommander.rotateRightHand(32);
-        sleep(300);
+        sleep(1000);
         mUsbCommander.lightLed(0, 0, 0);
     }
 }

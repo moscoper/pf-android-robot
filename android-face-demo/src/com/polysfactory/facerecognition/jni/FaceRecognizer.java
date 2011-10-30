@@ -43,4 +43,8 @@ public class FaceRecognizer {
     return NativeFaceRecognizerJNI.FaceRecognizer_recognize(swigCPtr, this, idx, image_pool.getCPtr(pool), pool);
   }
 
+  public void learn(String trainFileName) {
+    NativeFaceRecognizerJNI.FaceRecognizer_learn(swigCPtr, this, trainFileName);
+  }
+
 }

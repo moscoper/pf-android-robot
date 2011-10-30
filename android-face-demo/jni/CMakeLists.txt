@@ -52,9 +52,8 @@ endif(ANDROID)
 #this add's the swig path for the opencv wrappers
 SET(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-I${AndroidOpenCV_SWIG_DIR}" )
 
-#SET_SOURCE_FILES_PROPERTIES(foobar.i PROPERTIES CPLUSPLUS ON)
-#SET_SOURCE_FILES_PROPERTIES(BlinkModule.i PROPERTIES CPLUSPLUS ON)
 SET_SOURCE_FILES_PROPERTIES(NativeFaceRecognizer.i PROPERTIES CPLUSPLUS ON)
+SET_SOURCE_FILES_PROPERTIES(NativeFaceCrop.i PROPERTIES CPLUSPLUS ON)
 
 #add the swig module, giving it the name, java, and then all of the source files
 SWIG_ADD_MODULE(FaceRecognizer java 
@@ -62,12 +61,12 @@ SWIG_ADD_MODULE(FaceRecognizer java
                 FaceRecognizer.cpp HaarFaceDetector.cpp ObjectMatcher.cpp BlinkDetector.cpp EigenFace.cpp #cpp files can be compiled to
                 )
 
-#SWIG_ADD_MODULE(BlinkDetector java 
-#                BlinkModule.i #swig file
-#                BlinkDetector.cpp #cpp files can be compiled to
-#                )
+SWIG_ADD_MODULE(FaceCrop java 
+                NativeFaceCrop.i #swig file
+                HaarFaceDetector.cpp FaceCrop.cpp
+                )
 
 #link the module like any other
 target_link_libraries(FaceRecognizer ${LIBRARY_DEPS} )
-#target_link_libraries(HaarFaceDetector ${LIBRARY_DEPS} )
+target_link_libraries(FaceCrop ${LIBRARY_DEPS} )
 #target_link_libraries(BlinkDetector ${LIBRARY_DEPS} )

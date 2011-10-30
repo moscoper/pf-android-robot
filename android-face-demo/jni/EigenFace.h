@@ -4,8 +4,8 @@
 #include <opencv2/legacy/legacy.hpp>
 #include "log.h"
 
-#define FACE_WIDTH 100
-#define FACE_HEIGHT 100
+#define FACE_WIDTH 96
+#define FACE_HEIGHT 96
 
 /**
  * 固有顔のロジックで顔認識を行うクラス

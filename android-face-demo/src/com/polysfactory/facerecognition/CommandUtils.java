@@ -9,7 +9,7 @@ public class CommandUtils {
     }
 
     public static void randomLengthThinking(AudioCommander audioCommander) {
-        audioCommander.ringThinkingSound(random(3), 1);
+        audioCommander.ringThinkingSound(random(1), 1);
     }
 
     public static void randomEye(UsbCommander usbCommander) {

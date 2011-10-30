@@ -14,16 +14,15 @@ import com.polysfactory.facerecognition.UsbCommander;
  * @version $Revision$
  */
 public class BehaviorManager {
-    Vector<Behavior> behaviorVector;
+    private Vector<Behavior> behaviorVector;
 
-    UsbCommander mUsbCommander;
+    private Behavior currentBehavior;
 
-    Behavior currentBehavior;
+    private GreetToPersonBehavior greetToPersonBehavior;
 
-    GreetToPersonBehavior greetToPersonBehavior;
+    private Dance dance;
 
     public BehaviorManager(UsbCommander usbCommander, AudioCommander audioCommander) {
-        mUsbCommander = usbCommander;
         // ランダムに能動的に行う振る舞いはVectorに突っ込む
         behaviorVector = new Vector<Behavior>();
         // behaviorVector.add(new Greeting());
@@ -54,6 +53,10 @@ public class BehaviorManager {
         } else {
             Log.w(App.TAG, "thread is running");
         }
+    }
+
+    public void dance() {
+        new Thread(dance).start();
     }
 
     private Behavior getNewBehavior() {

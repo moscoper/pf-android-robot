@@ -1,5 +1,5 @@
-/* File : NativeFaceRecognizer.i */
-%module NativeFaceRecognizer
+/* File : NativeFaceCrop.i */
+%module NativeFaceCrop
 
 /*
  * the java import code muse be included for the opencv jni wrappers
@@ -20,8 +20,8 @@ import com.opencv.jni.*; //import the android-opencv jni wrappers
 			//lib to be found
 			//check the apk generated, by opening it in an archive manager, to verify that
 			//both these libraries are present
-			System.loadLibrary("android-opencv");
-			System.loadLibrary("FaceRecognizer");
+      System.loadLibrary("android-opencv");
+			System.loadLibrary("FaceCrop");
 		} catch (UnsatisfiedLinkError e) {
 			//badness
 			throw e;
@@ -31,28 +31,15 @@ import com.opencv.jni.*; //import the android-opencv jni wrappers
 %}
 
 %{
-#include "image_pool.h"
-#include "FaceRecognizer.h"
+#include "FaceCrop.h"
 using namespace cv;
 %}
 
-
-//import the android-cv.i file so that swig is aware of all that has been previous defined
-//notice that it is not an include....
-%import "android-cv.i"
-
-
-//make sure to import the image_pool as it is 
-//referenced by the Processor java generated
-//class
-//sample jni class
-%typemap(javaimports) FaceRecognizer "
-import com.opencv.jni.image_pool;// import the image_pool interface for playing nice with android-opencv
+%typemap(javaimports) FaceCrop "
 "
-class FaceRecognizer{
+class FaceCrop{
 public:
-	FaceRecognizer();
-  ~FaceRecognizer();
-	int recognize(int idx, image_pool* pool);
-  void learn(char* trainFileName);
+  FaceCrop();
+  ~FaceCrop();
+  bool crop (char* inFile);
 };

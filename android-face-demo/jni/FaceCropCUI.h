@@ -2,21 +2,16 @@
 顔を指定サイズで切り抜くためのプログラム
 */
 
-#ifndef FACE_CROP_H_
-#define FACE_CROP_H_
-
+#include <iostream>
+#include <fstream>
 #include <opencv2/opencv.hpp>
 #include "EigenFace.h"
 #include "HaarFaceDetector.h"
 #include "log.h"
 
+const int DIM_VECTOR = 128;  // 128次元ベクトル
+
 class FaceCrop {
 public:
-  FaceCrop();
-  ~FaceCrop();
-  bool crop (char* inFile);
-private:
-  HaarFaceDetector* haarFaceDetector;
-};
-
-#endif /* FACE_CROP_H_ */
+  void crop(char* infile, char* outfile);
+}

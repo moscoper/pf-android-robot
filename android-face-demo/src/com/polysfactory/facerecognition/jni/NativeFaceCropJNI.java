@@ -10,7 +10,7 @@ package com.polysfactory.facerecognition.jni;
 
 import com.opencv.jni.*; //import the android-opencv jni wrappers
 
-public class NativeFaceRecognizerJNI {
+public class NativeFaceCropJNI {
 
 	static {
 		try {
@@ -21,8 +21,8 @@ public class NativeFaceRecognizerJNI {
 			//lib to be found
 			//check the apk generated, by opening it in an archive manager, to verify that
 			//both these libraries are present
-			System.loadLibrary("android-opencv");
-			System.loadLibrary("FaceRecognizer");
+      System.loadLibrary("android-opencv");
+			System.loadLibrary("FaceCrop");
 		} catch (UnsatisfiedLinkError e) {
 			//badness
 			throw e;
@@ -30,8 +30,7 @@ public class NativeFaceRecognizerJNI {
 	}
 
 
-  public final static native long new_FaceRecognizer();
-  public final static native void delete_FaceRecognizer(long jarg1);
-  public final static native int FaceRecognizer_recognize(long jarg1, FaceRecognizer jarg1_, int jarg2, long jarg3, image_pool jarg3_);
-  public final static native void FaceRecognizer_learn(long jarg1, FaceRecognizer jarg1_, String jarg2);
+  public final static native long new_FaceCrop();
+  public final static native void delete_FaceCrop(long jarg1);
+  public final static native boolean FaceCrop_crop(long jarg1, FaceCrop jarg1_, String jarg2);
 }

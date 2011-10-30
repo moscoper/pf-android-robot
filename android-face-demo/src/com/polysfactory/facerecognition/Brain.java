@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.ContactsContract.Contacts;
 import android.provider.MediaStore.Audio.Media;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -47,11 +48,11 @@ public class Brain {
 
     Intent intent = new Intent();
 
-    volatile boolean stopThread = false;
-
     private AudioCommander mAudioCommander;
 
     private static final int INTERVAL = 20000;
+
+    private FacePhotoManager mFacePhotoManager;
 
     /**
      * コンストラクタ<br>
@@ -63,9 +64,19 @@ public class Brain {
         mAudioCommander = new AudioCommander(context);
         mFaceRecognizer = new FaceRecognizer();
         mBehaviorManager = new BehaviorManager(usbCommander, mAudioCommander);
+        mFacePhotoManager = new FacePhotoManager(context);
         initSpeechRecognizer();
         // this.start();
         activeHandler.sendEmptyMessageDelayed(100, INTERVAL);
+        mFacePhotoManager.update();
+        mFaceRecognizer.learn("/sdcard/photo/train.txt");
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mAudioCommander.test();
+            }
+        }, 10000);
     }
 
     /**
@@ -168,28 +179,24 @@ public class Brain {
             String text = array.get(i);
             Log.d(App.TAG, "actionOnListening:" + text);
             if (text.contains("前進") || text.contains("進め") || text.contains("進んで") || text.contains("ゴー")) {
-                stopThread = true;
                 mAudioCommander.stopMusic();
                 if (mUsbCommander != null) {
                     mUsbCommander.forward();
                 }
                 break;
             } else if (text.contains("停止") || text.contains("止まれ") || text.contains("とまれ") || text.contains("止まって") || text.contains("ストップ")) {
-                stopThread = true;
                 mAudioCommander.stopMusic();
                 if (mUsbCommander != null) {
                     mUsbCommander.stop();
                 }
                 break;
             } else if (text.contains("後退") || text.contains("戻れ") || text.contains("戻って") || text.contains("バック")) {
-                stopThread = true;
                 mAudioCommander.stopMusic();
                 if (mUsbCommander != null) {
                     mUsbCommander.backward();
                 }
                 break;
             } else if (text.contains("旋回") || text.contains("回れ") || text.contains("回って") || text.contains("まわれ")) {
-                stopThread = true;
                 mAudioCommander.stopMusic();
                 if (mUsbCommander != null) {
                     mUsbCommander.spinTurnLeft();
@@ -197,19 +204,24 @@ public class Brain {
                 }
                 break;
             } else if (text.contains("こんにちわ") || text.contains("こんにちは")) {
-                stopThread = true;
                 mAudioCommander.speakByRobotVoie("こんにちは");
                 break;
             } else if (text.contains("踊れ") || text.contains("踊って") || text.contains("おどれ")) {
                 mAudioCommander.playMusic(ContentUris.withAppendedId(Media.EXTERNAL_CONTENT_URI, 29));
-                stopThread = true;
-                new OdoruThread().start();
+                mBehaviorManager.dance();
+                break;
             } else if (text.contains("ありがとう")) {
-                stopThread = true;
                 mAudioCommander.speakByRobotVoie("ありがとうございました！");
+                break;
             } else if (text.contains("元気")) {
-                stopThread = true;
                 mAudioCommander.speakByRobotVoie("元気です！");
+                break;
+            } else if (text.contains("更新")) {
+                mAudioCommander.speakByRobotVoie("連絡帳から顔のデータを同期します。");
+                mFacePhotoManager.update();
+                mFaceRecognizer.learn("/sdcard/photo/train.txt");
+                Log.d(App.TAG, "同期しました");
+                break;
             }
         }
     }
@@ -217,7 +229,7 @@ public class Brain {
     int turn = 0;
 
     /**
-     * 入力された情報から次の動作を行う<br>
+     * 入力された画像情報から次の動作を行う<br>
      * @param idx
      * @param pool
      * @param timestamp
@@ -226,11 +238,12 @@ public class Brain {
         Log.d(App.TAG, "process:" + timestamp);
         timestamp = timestamp / (1000 * 1000);
         int objId = mFaceRecognizer.recognize(idx, pool);
-        String[] names = {"不明", "秋田", "ホソミ", "イガリ", "伊藤", "中澤", "古賀", "ナミカワ", "ハン", "佐藤", "ポリー", "山田", "ショウコ" };
+
         if (objId >= 0) {
             Log.d(App.TAG, "objId=" + objId + ",prevObjId=" + prevObjId + ",timediff=" + (timestamp - prevTime));
             if (timestamp - prevTime < 2000 && prevObjId == objId) {
-                mBehaviorManager.greetToPerson(names[objId]);
+                String name = mFacePhotoManager.getName(objId);
+                mBehaviorManager.greetToPerson(name);
             }
         }
         prevObjId = objId;
@@ -249,23 +262,6 @@ public class Brain {
 
     }
 
-    public class OdoruThread extends Thread {
-        public void run() {
-            stopThread = false;
-            while (true) {
-                if (stopThread) {
-                    break;
-                }
-                /*
-                 * int interval = 16; // double d = Math.random() * 2; // interval = (int) (((double) interval) * d); int commandId = (int) (Math.random() * 3); switch (commandId) { case 0:
-                 * degreeAdd(0, interval); break; case 1: degreeAdd(1, interval); break; case 2: degreeAdd(2, interval); break; // case 3: // nextEye(); // break; // } }
-                 */
-                mBehaviorManager.next();
-                mySleep(100);
-            }
-        }
-    }
-
     public void mySleep(long mills) {
         try {
             Thread.sleep(mills);
@@ -275,7 +271,6 @@ public class Brain {
     }
 
     public void reset() {
-        stopThread = true;
         activeHandler.removeMessages(100);
         mAudioCommander.stopMusic();
     }

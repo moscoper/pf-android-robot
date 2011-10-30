@@ -2,55 +2,50 @@
 顔を指定サイズで切り抜くためのプログラム
 */
 
-#include <iostream>
-#include <fstream>
-#include <opencv2/opencv.hpp>
-#include "HaarFaceDetector.h"
-#include "log.h"
+#include "FaceCrop.h"
 
-const int DIM_VECTOR = 128;  // 128次元ベクトル
-#define FACE_WIDTH 100
-#define FACE_HEIGHT 100
+/**
+ * コンストラクタ
+ */
+FaceCrop::FaceCrop () {
+  haarFaceDetector = new HaarFaceDetector(
+    "/data/data/com.polysfactory.facerecognition/files/haarcascade_frontalface_default.xml",
+    "/data/data/com.polysfactory.facerecognition/files/haarcascade_eye_tree_eyeglasses.xml",
+    "/data/data/com.polysfactory.facerecognition/files/haarcascade_mcs_mouth.xml");  
+}
 
-int main (int argc, char** argv) {
-  HaarFaceDetector* haarFaceDetector = new HaarFaceDetector(
-    "/workspace/OpenCV-2.3.0/data/haarcascades/haarcascade_frontalface_default.xml",
-    "/workspace/OpenCV-2.3.0/data/haarcascades/haarcascade_eye_tree_eyeglasses.xml",
-    "/workspace/OpenCV-2.3.0/data/haarcascades/haarcascade_mcs_mouth.xml");
+/**
+ * デストラクタ
+ */
+FaceCrop::~FaceCrop () {
+  delete(haarFaceDetector);
+}
 
-  if (argc != 3) {
-    LOGE("please specify input and output file name.");
-    return -1;    
-  }
-  const char* inFile = argc == 3 ? argv[1] : "image/accordion_image_0001.jpg";
-  const char* outFile = argc == 3 ? argv[2] : "image/accordion_image_0001.jpg";
-  
-  // SURF抽出用に画像をグレースケールで読み込む
-  IplImage* grayImage = cvLoadImage(inFile, CV_LOAD_IMAGE_GRAYSCALE);
-  IplImage* colorImage = cvLoadImage(inFile, CV_LOAD_IMAGE_ANYCOLOR);
-  if (!grayImage) {
+/**
+ * 顔の部分だけ指定されたサイズで顔を切り抜く
+ */
+bool FaceCrop::crop (char* inFile) {
+  IplImage* srcImage = cvLoadImage(inFile, CV_LOAD_IMAGE_ANYCOLOR);
+  if (!srcImage) {
     LOGE("cannot find image file: %s", inFile);
     return -1;
   }
-
   CvRect faceRect;
-  bool find = haarFaceDetector->detectFace(grayImage, &faceRect);
+  bool find = haarFaceDetector->detectFace(srcImage, &faceRect);
   if (find) {
-    cvSetImageROI(grayImage, faceRect);
-    //cvSetImageROI(colorImage, faceRect);
-    //IplImage* faceImage = cvCreateImage(cvSize(faceRect.width, faceRect.height), IPL_DEPTH_8U, 3);
-    IplImage* resizedFaceImage = cvCreateImage(cvSize(FACE_WIDTH, FACE_HEIGHT), IPL_DEPTH_8U, 1);
-    //cvCopy(colorImage, faceImage);
-    cvResize(grayImage, resizedFaceImage, CV_INTER_AREA);
-    cvSaveImage(outFile, resizedFaceImage);
-    
-    //cvReleaseImage(&faceImage);
+    cvSetImageROI(srcImage, faceRect);
+    IplImage* resizedFaceImage = cvCreateImage(cvSize(FACE_WIDTH, FACE_HEIGHT), IPL_DEPTH_8U, 3);
+    cvResize(srcImage, resizedFaceImage, CV_INTER_AREA);
+    int r = cvSaveImage(inFile, resizedFaceImage);
+    if (r != 1) {
+      LOGW("save error:%d", r);
+    } else {
+      LOGI("save success");
+    }
     cvReleaseImage(&resizedFaceImage);
+  } else {
+    LOGW("can't find faces");
   }
-    
-  cvReleaseImage(&grayImage);
-  cvReleaseImage(&colorImage);
-  cvDestroyAllWindows();
-  
-  return 0;
+  cvReleaseImage(&srcImage);  
+  return find;
 }

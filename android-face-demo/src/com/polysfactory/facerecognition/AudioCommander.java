@@ -12,6 +12,7 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.util.Log;
 
+import com.polysfactory.facerecognition.util.IOUtils;
 import com.polysfactory.robotaudio.jni.RobotAudio;
 
 /**
@@ -69,6 +70,33 @@ public class AudioCommander {
     public void ringThinkingSound(int loop, float rate) {
         Log.d(App.TAG, "ring thinking sound:" + loop);
         soundPool.play(thinkingSoundId, 0.5F, 0.5F, 1, loop, rate);
+    }
+
+    public void test() {
+        String target[] = new String[] {
+                "あーーーーーーーーーーーー",
+                "いーーーーーーーーーーーー",
+                "うーーーーーーーーーーーー",
+                "えーーーーーーーーーーーー",
+                "おーーーーーーーーーーーー"
+        };
+        int counter = 0;
+        for (String text : target) {
+            tts.synthesizeToFile(text, null, "/sdcard/poly.wav");
+            try {
+                Thread.sleep(1500);
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
+            }
+            robotAudio.pitchShift(10);
+            try {
+                //IOUtils.copyTransfer("/sdcard/robot.wav", "/sdcard/" + text + ".wav");
+                IOUtils.copyTransfer("/sdcard/robot.wav", "/sdcard/" + counter + ".wav");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            counter++;
+        }
     }
 
     /**
