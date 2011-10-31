@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.ContactsContract.Contacts;
 import android.provider.MediaStore.Audio.Media;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -16,6 +15,7 @@ import android.speech.SpeechRecognizer;
 import android.util.Log;
 
 import com.opencv.jni.image_pool;
+import com.polysfactory.facerecognition.EmotionManager.Emotion;
 import com.polysfactory.facerecognition.behavior.BehaviorManager;
 import com.polysfactory.facerecognition.jni.FaceRecognizer;
 
@@ -52,7 +52,14 @@ public class Brain {
 
     private static final int INTERVAL = 20000;
 
+    /** 顔写真を扱うマネージャークラス */
     private FacePhotoManager mFacePhotoManager;
+
+    ActiveHandler activeHandler = new ActiveHandler();
+
+    private EmotionManager mEmotionManager;
+
+    private OnRebootCommandListener mOnRebootCommandListener;
 
     /**
      * コンストラクタ<br>
@@ -62,8 +69,9 @@ public class Brain {
         mContext = context;
         mUsbCommander = usbCommander;
         mAudioCommander = new AudioCommander(context);
+        mEmotionManager = new EmotionManager();
         mFaceRecognizer = new FaceRecognizer();
-        mBehaviorManager = new BehaviorManager(usbCommander, mAudioCommander);
+        mBehaviorManager = new BehaviorManager(usbCommander, mAudioCommander, mEmotionManager);
         mFacePhotoManager = new FacePhotoManager(context);
         initSpeechRecognizer();
         // this.start();
@@ -71,12 +79,16 @@ public class Brain {
         mFacePhotoManager.update();
         mFaceRecognizer.learn("/sdcard/photo/train.txt");
 
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mAudioCommander.test();
-            }
-        }, 10000);
+        // handler.postDelayed(new Runnable() {
+        // @Override
+        // public void run() {
+        // mAudioCommander.test();
+        // }
+        // }, 10000);
+    }
+
+    public void setOnRebootCommandListener(OnRebootCommandListener onRebootCommandListener) {
+        this.mOnRebootCommandListener = onRebootCommandListener;
     }
 
     /**
@@ -204,7 +216,7 @@ public class Brain {
                 }
                 break;
             } else if (text.contains("こんにちわ") || text.contains("こんにちは")) {
-                mAudioCommander.speakByRobotVoie("こんにちは");
+                mBehaviorManager.greet();
                 break;
             } else if (text.contains("踊れ") || text.contains("踊って") || text.contains("おどれ")) {
                 mAudioCommander.playMusic(ContentUris.withAppendedId(Media.EXTERNAL_CONTENT_URI, 29));
@@ -217,11 +229,29 @@ public class Brain {
                 mAudioCommander.speakByRobotVoie("元気です！");
                 break;
             } else if (text.contains("更新")) {
-                mAudioCommander.speakByRobotVoie("連絡帳から顔のデータを同期します。");
+                mAudioCommander.speakByRobotVoie("顔データを更新します。");
                 mFacePhotoManager.update();
                 mFaceRecognizer.learn("/sdcard/photo/train.txt");
                 Log.d(App.TAG, "同期しました");
                 break;
+            } else if (text.contains("うるさい")) {
+                mEmotionManager.feelBad();
+                if (mEmotionManager.getEmotion() == Emotion.ANGRY) {
+                    mBehaviorManager.talkBack();
+                } else {
+                    mBehaviorManager.apologize();
+                }
+                Log.d(App.TAG, "うるさいと言われました");
+                break;
+            } else if (text.contains("かっこいい") || text.contains("素敵") || text.contains("最高")) {
+                mEmotionManager.feelGood();
+                mBehaviorManager.feelShy();
+                Log.d(App.TAG, "ほめられました");
+                break;
+            } else if (text.contains("再起動")) {
+                if (mOnRebootCommandListener != null) {
+                    mOnRebootCommandListener.onRebootCommand();
+                }
             }
         }
     }
@@ -250,8 +280,6 @@ public class Brain {
         prevTime = timestamp;
     }
 
-    ActiveHandler activeHandler = new ActiveHandler();
-
     public class ActiveHandler extends Handler {
 
         @Override
@@ -273,5 +301,9 @@ public class Brain {
     public void reset() {
         activeHandler.removeMessages(100);
         mAudioCommander.stopMusic();
+    }
+
+    public interface OnRebootCommandListener {
+        public void onRebootCommand();
     }
 }

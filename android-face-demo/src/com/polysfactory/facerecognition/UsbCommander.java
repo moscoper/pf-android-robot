@@ -102,10 +102,11 @@ public class UsbCommander extends BroadcastReceiver {
             mOutputStream = new FileOutputStream(fd);
             // Thread thread = new Thread(null, this, "DemoKit");
             // thread.start();
+            reset();
             Log.d(App.TAG, "accessory opened");
-            enableControls(true);
+            // enableControls(true);
         } else {
-            Log.d(App.TAG, "accessory open fail");
+            Log.e(App.TAG, "accessory open fail");
         }
     }
 
@@ -114,7 +115,7 @@ public class UsbCommander extends BroadcastReceiver {
      */
     public void closeAccessory() {
         Log.d(App.TAG, "close USBAccessory");
-        enableControls(false);
+        // enableControls(false);
 
         try {
             if (mFileDescriptor != null) {
@@ -146,9 +147,6 @@ public class UsbCommander extends BroadcastReceiver {
                 this.closeAccessory();
             }
         }
-    }
-
-    protected void enableControls(boolean enable) {
     }
 
     /**
@@ -271,6 +269,24 @@ public class UsbCommander extends BroadcastReceiver {
             } catch (IOException e) {
                 Log.e(App.TAG, "rotateLeftHandError", e);
             }
+        }
+    }
+
+    /**
+     * 全てのものを初期位置に戻す<br>
+     */
+    private void reset() {
+        try {
+            stop();
+            Thread.sleep(100);
+            rotateLeftHand(10);
+            Thread.sleep(100);
+            rotateRightHand(10);
+            Thread.sleep(100);
+            lightLed(0);
+        } catch (InterruptedException e) {
+            // TODO 自動生成された catch ブロック
+            e.printStackTrace();
         }
     }
 }

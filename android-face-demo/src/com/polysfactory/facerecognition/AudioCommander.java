@@ -7,6 +7,7 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
+import android.media.SoundPool.OnLoadCompleteListener;
 import android.net.Uri;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
@@ -36,6 +37,8 @@ public class AudioCommander {
 
     private int thinkingSoundId;
 
+    private int bootSoundId;
+
     public AudioCommander(Context context) {
         mContext = context;
         // setup TextToSpeech object
@@ -58,8 +61,17 @@ public class AudioCommander {
             }
         });
         soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+        soundPool.setOnLoadCompleteListener(new OnLoadCompleteListener() {
+            @Override
+            public void onLoadComplete(SoundPool arg0, int soundId, int status) {
+                if (soundId == bootSoundId) {
+                    bootSound();
+                }
+            }
+        });
         // thinkingSoundId = soundPool.load(context, R.raw.thinking, 1);
         thinkingSoundId = soundPool.load(context, R.raw.thinking2, 1);
+        bootSoundId = soundPool.load(context, R.raw.startup1, 1);
     }
 
     /**
@@ -90,7 +102,7 @@ public class AudioCommander {
             }
             robotAudio.pitchShift(10);
             try {
-                //IOUtils.copyTransfer("/sdcard/robot.wav", "/sdcard/" + text + ".wav");
+                // IOUtils.copyTransfer("/sdcard/robot.wav", "/sdcard/" + text + ".wav");
                 IOUtils.copyTransfer("/sdcard/robot.wav", "/sdcard/" + counter + ".wav");
             } catch (IOException e) {
                 e.printStackTrace();
@@ -121,18 +133,19 @@ public class AudioCommander {
             mp.setDataSource("/sdcard/robot.wav");
             mp.prepare();
         } catch (IllegalArgumentException e) {
-            // TODO 自動生成された catch ブロック
             e.printStackTrace();
         } catch (IllegalStateException e) {
-            // TODO 自動生成された catch ブロック
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO 自動生成された catch ブロック
             e.printStackTrace();
         }
         mp.start();
     }
 
+    /**
+     * 音をならす<br>
+     * @param audioUri
+     */
     public void playMusic(Uri audioUri) {
         if (mp != null) {
             mp.release();
@@ -143,18 +156,21 @@ public class AudioCommander {
             mp.setDataSource(mContext, audioUri);
             mp.prepare();
         } catch (IllegalArgumentException e) {
-            // TODO 自動生成された catch ブロック
             e.printStackTrace();
+            return;
         } catch (IllegalStateException e) {
-            // TODO 自動生成された catch ブロック
             e.printStackTrace();
+            return;
         } catch (IOException e) {
-            // TODO 自動生成された catch ブロック
             e.printStackTrace();
+            return;
         }
         mp.start();
     }
 
+    /**
+     * 再生を停止する<br>
+     */
     public void stopMusic() {
         if (mp != null) {
             mp.release();
@@ -162,4 +178,10 @@ public class AudioCommander {
         }
     }
 
+    /**
+     * 起動音をならす<br>
+     */
+    public void bootSound() {
+        soundPool.play(bootSoundId, 1.0F, 1.0F, 1, 0, 0);
+    }
 }

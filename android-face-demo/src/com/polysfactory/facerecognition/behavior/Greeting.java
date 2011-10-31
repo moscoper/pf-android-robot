@@ -12,18 +12,29 @@ import com.polysfactory.facerecognition.CommandUtils;
  */
 public class Greeting extends Behavior {
 
+    int n = 0;
+
     @Override
     public void execute() {
         Log.d(App.TAG, "Greeting::action");
         CommandUtils.randomEye(mUsbCommander);
         sleep(100);
-        mUsbCommander.rotateRightHand(50);
-        sleep(1000);
+        if (n == 1) {
+            mUsbCommander.rotateRightHand(60);
+        } else {
+            mUsbCommander.rotateLeftHand(60);
+        }
+        mAudioCommander.speakByRobotVoie("こんにちは");
         mUsbCommander.lightLed(0, 3, 0);
         sleep(100);
-        mUsbCommander.rotateRightHand(32);
+        if (n == 1) {
+            mUsbCommander.rotateRightHand(10);
+        } else {
+            mUsbCommander.rotateLeftHand(10);
+        }
         sleep(1000);
         mUsbCommander.lightLed(0, 0, 0);
+        n = (n + 1) % 2;
     }
 
 }

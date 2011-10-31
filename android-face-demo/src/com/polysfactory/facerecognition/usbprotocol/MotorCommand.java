@@ -10,15 +10,19 @@ public class MotorCommand {
 
     public static final byte motor1Stop = 0;
 
-    public static final byte motor1Forward = (0x01) << 2;
+    // public static final byte motor1Forward = (0x01) << 2;
+    public static final byte motor1Backward = (0x01) << 2;
 
-    public static final byte motor1Backward = (3) << 2;
+    // public static final byte motor1Backward = (3) << 2;
+    public static final byte motor1Forward = (3) << 2;
 
     public static final byte motor2Stop = 0;
 
-    public static final byte motor2Forward = (0x01) << 4;
+    // public static final byte motor2Foreward = (0x01) << 4;
+    public static final byte motor2Backward = (0x01) << 4;
 
-    public static final byte motor2Backward = (byte) ((3) << 4);
+    // public static final byte motor2Backward = (byte) ((3) << 4);
+    public static final byte motor2Forward = (byte) ((3) << 4);
 
     private byte commandByte = 0;
 

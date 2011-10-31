@@ -30,6 +30,9 @@ public class ServoCommand {
      */
     public void setServoDegree(int servoId, int degree) {
         Assert.assertEquals(true, degree < 64);
+        if (servoId == 1) {
+            degree = 63 - degree;
+        }
         servoDegree[servoId] = degree;
     }
 

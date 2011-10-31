@@ -5,4 +5,5 @@
 <string name="about_title">About FooBar</string>
 <string name="about_menu">About</string>
 <string name="ok">O.K.</string>
+<string name="Reboot">再起動</string>
 </resources>

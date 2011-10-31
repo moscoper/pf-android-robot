@@ -6,10 +6,10 @@ import com.polysfactory.facerecognition.UsbCommander;
 
 /**
  * 振る舞いパターンの基底インターフェース<br>
- * @author $Author$
- * @version $Revision$
+ * @author $Author: horikawa.takahiro@gmail.com $
+ * @version $Revision: 60 $
  */
-public abstract class Behavior implements Runnable {
+public abstract class Playing implements Runnable {
 
     UsbCommander mUsbCommander;
 
