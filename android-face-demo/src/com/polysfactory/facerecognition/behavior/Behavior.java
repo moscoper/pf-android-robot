@@ -41,6 +41,7 @@ public abstract class Behavior implements Runnable {
         mBehaviorInfo.isRunning = true;
         mBehaviorInfo.canInterrupt = true;
         execute();
+        mBehaviorInfo.stopFlag = false;
         mBehaviorInfo.isRunning = false;
     }
 

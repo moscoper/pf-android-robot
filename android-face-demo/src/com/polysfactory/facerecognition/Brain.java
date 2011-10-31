@@ -40,7 +40,7 @@ public class Brain {
 
     BehaviorManager mBehaviorManager;
 
-    SpeechRecognizer sr;
+    SpeechRecognizer mSpeechRecognizer;
 
     Handler handler = new Handler();
 
@@ -53,11 +53,13 @@ public class Brain {
     /** 顔写真を扱うマネージャークラス */
     private FacePhotoManager mFacePhotoManager;
 
-    ActiveHandler activeHandler = new ActiveHandler();
+    ActiveHandler mActiveHandler = new ActiveHandler();
 
     private EmotionManager mEmotionManager;
 
     private OnRebootCommandListener mOnRebootCommandListener;
+
+    boolean finished = false;
 
     /**
      * コンストラクタ<br>
@@ -73,7 +75,7 @@ public class Brain {
         mFacePhotoManager = new FacePhotoManager(context);
         initSpeechRecognizer();
         // this.start();
-        activeHandler.sendEmptyMessageDelayed(100, INTERVAL);
+        mActiveHandler.sendEmptyMessageDelayed(100, INTERVAL);
         mFacePhotoManager.update();
         mFaceRecognizer.learn("/sdcard/photo/train.txt");
 
@@ -94,17 +96,15 @@ public class Brain {
      */
     void initSpeechRecognizer() {
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        sr = SpeechRecognizer.createSpeechRecognizer(mContext);
-        sr.setRecognitionListener(new RecognitionListener() {
+        mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(mContext);
+        mSpeechRecognizer.setRecognitionListener(new RecognitionListener() {
             @Override
             public void onRmsChanged(float rmsdB) {
-                // TODO Auto-generated method stub
                 // Log.d(App.TAG, "onRmsChanged");
             }
 
             @Override
             public void onResults(Bundle results) {
-                // TODO Auto-generated method stub
                 Log.d(App.TAG, "onResults");
                 ArrayList<String> array = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
                 for (String s : array) {
@@ -114,69 +114,67 @@ public class Brain {
                 if (array.size() > 0) {
                     actionOnListening(array);
                 }
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        sr.startListening(intent);
-                    }
-                }, 0);
+
+                if (!finished) {
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mSpeechRecognizer.startListening(intent);
+                        }
+                    }, 0);
+                }
             }
 
             @Override
             public void onReadyForSpeech(Bundle params) {
-                // TODO Auto-generated method stub
                 Log.d(App.TAG, "onReadyForSpeech");
             }
 
             @Override
             public void onPartialResults(Bundle partialResults) {
-                // TODO Auto-generated method stub
                 Log.d(App.TAG, "onPartialResults");
             }
 
             @Override
             public void onEvent(int eventType, Bundle params) {
-                // TODO Auto-generated method stub
                 Log.d(App.TAG, "onEvent");
             }
 
             @Override
             public void onError(int error) {
-                // TODO Auto-generated method stub
                 Log.d(App.TAG, "onError:" + error);
                 if (error != SpeechRecognizer.ERROR_RECOGNIZER_BUSY) {
                     int delayed = 0;
                     if (error == SpeechRecognizer.ERROR_NETWORK) {
                         delayed = 10000;
                     }
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            sr.startListening(intent);
-                        }
-                    }, delayed);
+                    if (!finished) {
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                mSpeechRecognizer.startListening(intent);
+                            }
+                        }, delayed);
+                    }
                 }
             }
 
             @Override
             public void onEndOfSpeech() {
-                // TODO Auto-generated method stub
                 Log.d(App.TAG, "onEndOfSpeech");
             }
 
             @Override
             public void onBufferReceived(byte[] buffer) {
-                // TODO Auto-generated method stub
                 // Log.d(App.TAG, "onBurfferReceived");
             }
 
             @Override
             public void onBeginningOfSpeech() {
-                // TODO Auto-generated method stub
                 Log.d(App.TAG, "onBeginningOfSpeech");
             }
         });
-        sr.startListening(intent);
+        mSpeechRecognizer.startListening(intent);
     }
 
     /**
@@ -216,7 +214,7 @@ public class Brain {
             } else if (text.contains("こんにちわ") || text.contains("こんにちは")) {
                 mBehaviorManager.greet();
                 break;
-            } else if (text.contains("踊れ") || text.contains("踊って") || text.contains("おどれ")) {
+            } else if (text.contains("踊れ") || text.contains("踊って") || text.contains("おどって") || text.contains("おどれ")) {
                 mBehaviorManager.dance();
                 break;
             } else if (text.contains("ありがとう")) {
@@ -231,7 +229,7 @@ public class Brain {
                 mFaceRecognizer.learn("/sdcard/photo/train.txt");
                 Log.d(App.TAG, "同期しました");
                 break;
-            } else if (text.contains("うるさい")) {
+            } else if (text.contains("うるさい") || text.contains("バカ")) {
                 mEmotionManager.feelBad();
                 if (mEmotionManager.getEmotion() == Emotion.ANGRY) {
                     mBehaviorManager.talkBack();
@@ -282,7 +280,7 @@ public class Brain {
         @Override
         public void handleMessage(Message msg) {
             mBehaviorManager.next();
-            activeHandler.sendEmptyMessageDelayed(100, INTERVAL);
+            mActiveHandler.sendEmptyMessageDelayed(100, INTERVAL);
         }
 
     }
@@ -296,9 +294,12 @@ public class Brain {
     }
 
     public void reset() {
-        activeHandler.removeMessages(100);
+        Log.d(App.TAG, "end of brain");
+        finished = true;
+        mActiveHandler.removeMessages(100);
         mBehaviorManager.stop();
         mAudioCommander.stopMusic();
+        mSpeechRecognizer.stopListening();
     }
 
     public interface OnRebootCommandListener {
