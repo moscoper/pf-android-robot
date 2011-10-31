@@ -174,16 +174,17 @@ int EigenFace::findNearestNeighbor(float * projectedTestFace)
       float d_i =
         projectedTestFace[i] -
         projectedTrainFaceMat->data.fl[iTrain*nEigens + i];
-      //distSq += d_i*d_i / eigenValMat->data.fl[i];  // Mahalanobis
-      distSq += d_i*d_i; // Euclidean
+      distSq += d_i*d_i / eigenValMat->data.fl[i];  // Mahalanobis
+      //distSq += d_i*d_i; // Euclidean
     }
-
+    LOGI("EigenFace:Dist(%d): %f", trainPersonNumMat->data.i[iTrain], distSq);
     if(distSq < leastDistSq)
     {
       leastDistSq = distSq;
       iNearest = iTrain;
     }
   }
+  LOGI("EigenFace:NearestDist: %f", leastDistSq);
 
   return iNearest;
 }

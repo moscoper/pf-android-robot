@@ -9,6 +9,7 @@ public class GreetToPersonBehavior extends Behavior {
 
     @Override
     public void execute() {
+        mBehaviorInfo.canInterrupt = false;
         Log.d(App.TAG, "Greeting::action");
         mUsbCommander.lightLed(0, 0, 3);
         sleep(100);

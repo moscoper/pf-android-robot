@@ -21,6 +21,18 @@ public class Guchi extends Behavior {
             // ""
     };
 
+    // String sentenses[] = new String[] {
+    // "I'm exhausting",
+    // "I'm hangry",
+    // "I'm sleepy",
+    // // "早く、アイスクリームサンドイッチに、なりたいなー",
+    // "I want iPhone five!",
+    // "I worked so hard today",
+    // "Please update me fast",
+    // // "なんかうまいもん、食べたい",
+    // // ""
+    // };
+
     @Override
     public void execute() {
         // mAudioCommander.speakByRobotVoie("ハハハッ！！血迷ったか？");

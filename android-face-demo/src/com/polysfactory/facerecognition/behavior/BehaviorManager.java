@@ -2,10 +2,6 @@ package com.polysfactory.facerecognition.behavior;
 
 import java.util.Vector;
 
-import android.R.bool;
-import android.util.Log;
-
-import com.polysfactory.facerecognition.App;
 import com.polysfactory.facerecognition.AudioCommander;
 import com.polysfactory.facerecognition.EmotionManager;
 import com.polysfactory.facerecognition.UsbCommander;
@@ -36,75 +32,78 @@ public class BehaviorManager {
 
     public class BehaviorInfo {
         /** 何らかのスレッドが実行中であることを示すフラグ */
-        bool isRunning;
+        boolean isRunning = false;
 
         /** スレッドを終了させるためのフラグ */
-        bool stopFlag;
+        boolean stopFlag = false;
 
-        /** 現在実行中のスレッドが割り込み可能かどうかを表すフラグ */
-        bool canInterrupt;
+        /** ほかの振る舞いによって中断される状態かどうか */
+        boolean canInterrupt = false;
     }
 
     public BehaviorManager(UsbCommander usbCommander, AudioCommander audioCommander, EmotionManager emotionManager) {
+        behaviorInfo = new BehaviorInfo();
         // ランダムに能動的に行う振る舞いはVectorに突っ込む
         behaviorVector = new Vector<Behavior>();
         // behaviorVector.add(new Greeting());
-        // behaviorVector.add(new UroUro());
-        // behaviorVector.add(new KyoroKyoro());
+        behaviorVector.add(new UroUro());
+        behaviorVector.add(new KyoroKyoro());
         // behaviorVector.add(new Wondering());
         // behaviorVector.add(new Thinking());
         behaviorVector.add(new Guchi());
-        // behaviorVector.add(new GuruGuru());
-        // behaviorVector.add(new UroUro());
-        behaviorVector.add(new Thinking());
+        behaviorVector.add(new GuruGuru());
+        // behaviorVector.add(new Thinking());
         behaviorVector.add(new Sing());
-        behaviorVector.add(new Sing2());
+        behaviorVector.add(new BataBata());
 
         // 外的要因によって受動的に行う振る舞いは個別のオブジェクトに持つ
         greetToPersonBehavior = new GreetToPersonBehavior();
         greetToPersonBehavior.mUsbCommander = usbCommander;
         greetToPersonBehavior.mAudioCommander = audioCommander;
         greetToPersonBehavior.mEmotionManager = emotionManager;
+        greetToPersonBehavior.mBehaviorInfo = behaviorInfo;
 
         dance = new Dance();
         dance.mUsbCommander = usbCommander;
         dance.mAudioCommander = audioCommander;
         dance.mEmotionManager = emotionManager;
+        dance.mBehaviorInfo = behaviorInfo;
 
         talkBack = new TalkBack();
         talkBack.mUsbCommander = usbCommander;
         talkBack.mAudioCommander = audioCommander;
         talkBack.mEmotionManager = emotionManager;
+        talkBack.mBehaviorInfo = behaviorInfo;
 
         apologize = new Apologize();
         apologize.mUsbCommander = usbCommander;
         apologize.mAudioCommander = audioCommander;
         apologize.mEmotionManager = emotionManager;
+        apologize.mBehaviorInfo = behaviorInfo;
 
         shy = new Shy();
         shy.mUsbCommander = usbCommander;
         shy.mAudioCommander = audioCommander;
         shy.mEmotionManager = emotionManager;
+        shy.mBehaviorInfo = behaviorInfo;
 
         greeting = new Greeting();
         greeting.mUsbCommander = usbCommander;
         greeting.mAudioCommander = audioCommander;
         greeting.mEmotionManager = emotionManager;
+        greeting.mBehaviorInfo = behaviorInfo;
 
         for (Behavior b : behaviorVector) {
             b.mUsbCommander = usbCommander;
             b.mAudioCommander = audioCommander;
             b.mEmotionManager = emotionManager;
+            b.mBehaviorInfo = behaviorInfo;
         }
     }
 
     public void greetToPerson(String name) {
         greetToPersonBehavior.name = name;
-        if (!greetToPersonBehavior.isRunning()) {
-            new Thread(greetToPersonBehavior).start();
-        } else {
-            Log.w(App.TAG, "thread is running");
-        }
+        new Thread(greetToPersonBehavior).start();
     }
 
     public void dance() {
@@ -134,10 +133,10 @@ public class BehaviorManager {
 
     public void next() {
         currentBehavior = getNewBehavior();
-        if (!currentBehavior.isRunning()) {
-            new Thread(currentBehavior).start();
-        } else {
-            Log.w(App.TAG, "thread is running");
-        }
+        new Thread(currentBehavior).start();
+    }
+
+    public void stop() {
+        behaviorInfo.stopFlag = true;
     }
 }

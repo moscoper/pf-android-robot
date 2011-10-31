@@ -2,13 +2,11 @@ package com.polysfactory.facerecognition;
 
 import java.util.ArrayList;
 
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.MediaStore.Audio.Media;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -50,7 +48,7 @@ public class Brain {
 
     private AudioCommander mAudioCommander;
 
-    private static final int INTERVAL = 20000;
+    private static final int INTERVAL = 30000;
 
     /** 顔写真を扱うマネージャークラス */
     private FacePhotoManager mFacePhotoManager;
@@ -219,7 +217,6 @@ public class Brain {
                 mBehaviorManager.greet();
                 break;
             } else if (text.contains("踊れ") || text.contains("踊って") || text.contains("おどれ")) {
-                mAudioCommander.playMusic(ContentUris.withAppendedId(Media.EXTERNAL_CONTENT_URI, 29));
                 mBehaviorManager.dance();
                 break;
             } else if (text.contains("ありがとう")) {
@@ -300,6 +297,7 @@ public class Brain {
 
     public void reset() {
         activeHandler.removeMessages(100);
+        mBehaviorManager.stop();
         mAudioCommander.stopMusic();
     }
 
