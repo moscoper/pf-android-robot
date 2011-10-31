@@ -38,19 +38,58 @@ public class Top extends Activity implements Runnable {
         Button stopMotor1Button = (Button) findViewById(R.id.StopMotor1);
         Button forwardMotor1Button = (Button) findViewById(R.id.ForwardMotor1);
         Button backwardMotor1Button = (Button) findViewById(R.id.BackwardMotor1);
+        Button servo1 = (Button) findViewById(R.id.Servo1);
+        Button servo2 = (Button) findViewById(R.id.Servo2);
+        Button servo3 = (Button) findViewById(R.id.Servo3);
         stopMotor1Button.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                usbCommander.forward();
+                usbCommander.stop();
             }
         });
         forwardMotor1Button.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                usbCommander.backward();
+                usbCommander.forward();
             }
         });
         backwardMotor1Button.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                usbCommander.spinTurnLeft();
+                usbCommander.backward();
+            }
+        });
+        servo1.setOnClickListener(new OnClickListener() {
+            int n = 0;
+
+            @Override
+            public void onClick(View arg0) {
+                if ((n++) % 2 == 1) {
+                    usbCommander.rotateLeftHand(0);
+                } else {
+                    usbCommander.rotateLeftHand(63);
+                }
+            }
+        });
+        servo2.setOnClickListener(new OnClickListener() {
+            int n = 0;
+
+            @Override
+            public void onClick(View arg0) {
+                if ((n++) % 2 == 1) {
+                    usbCommander.rotateRightHand(0);
+                } else {
+                    usbCommander.rotateRightHand(63);
+                }
+            }
+        });
+        servo3.setOnClickListener(new OnClickListener() {
+            int n = 0;
+
+            @Override
+            public void onClick(View arg0) {
+                if ((n++) % 2 == 1) {
+                    usbCommander.rotateNeck(0);
+                } else {
+                    usbCommander.rotateNeck(63);
+                }
             }
         });
     }
