@@ -16,6 +16,8 @@ public class Dance extends Behavior {
             CommandUtils.randomEye(mUsbCommander);
             sleep(100);
             CommandUtils.randomMove(mUsbCommander);
+            sleep(100);
+            CommandUtils.randomHand(mUsbCommander);
             sleep(400);
             if (mBehaviorInfo.stopFlag) {
                 break;

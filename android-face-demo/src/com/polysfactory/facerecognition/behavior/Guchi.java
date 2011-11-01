@@ -42,8 +42,12 @@ public class Guchi extends Behavior {
         int n = (int) (Math.random() * sentenses.length);
         CommandUtils.randomHand(mUsbCommander);
         mAudioCommander.speakByRobotVoie(sentenses[n]);
-        sleep(1000);
         mUsbCommander.lightLed(0, 0, 0);
+        sleep(100);
+        mUsbCommander.rotateLeftHand(10);
+        sleep(100);
+        mUsbCommander.rotateRightHand(10);
+        sleep(100);
     }
 
 }
